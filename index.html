@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro Producción - Hongos Ostra</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header>
+  <h1>🍄 Registro de Producción</h1>
+  <p>Control integral de producción - Hongos Ostra</p>
+</header>
+
+<!-- ========================= -->
+<!-- PESTAÑAS -->
+<!-- ========================= -->
+
+<div class="tabs">
+  <button onclick="showTab('registro')" id="tabRegistro" class="active">
+    Registro
+  </button>
+  <button onclick="showTab('calculadora')" id="tabCalculadora">
+    Calculadora
+  </button>
+</div>
+
+<main>
+
+  <!-- ========================= -->
+  <!-- TAB REGISTRO -->
+  <!-- ========================= -->
+
+  <div id="registroTab">
+
+    <!-- REGISTRO DIARIO -->
+    <section class="form-section">
+      <h2>Registro Diario</h2>
+
+      <form id="entryForm">
+        <div class="row">
+          <label>Fecha<input type="date" id="fecha" required /></label>
+          <label>Lote<input type="text" id="lote" placeholder="Lote / ID" /></label>
+        </div>
+
+        <div class="row">
+          <label>Tarros<input type="number" id="tarros" min="0" required /></label>
+          <label>Peso Seco (kg)<input type="number" id="peso" min="0" step="0.01" required /></label>
+          <label>Humedad (%)<input type="number" id="humedad" min="0" max="100" step="0.1" /></label>
+        </div>
+
+        <label class="full">Observaciones<textarea id="obs"></textarea></label>
+
+        <div class="actions">
+          <button type="submit">Guardar</button>
+          <button type="button" id="clearBtn">Limpiar</button>
+        </div>
+      </form>
+
+      <div class="calculations">
+        <h3>Totales</h3>
+        <p id="totalEntradas">Entradas: 0</p>
+        <p id="totalPeso">Peso total: 0 kg</p>
+        <p id="pesoPromedio">Promedio por tarro: 0 kg</p>
+      </div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="table-section">
+      <h2>Historial</h2>
+      <table id="entriesTable">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Lote</th>
+            <th>Tarros</th>
+            <th>Peso</th>
+            <th>Humedad</th>
+            <th>Obs</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- TAB CALCULADORA -->
+  <!-- ========================= -->
+
+  <div id="calculadoraTab" style="display:none;">
+
+    <section class="form-section">
+      <h2>Calculadora - Pasteurización Agua Caliente</h2>
+
+      <div class="row">
+        <label>Kilos paja
+          <input type="number" id="paja" value="100" step="0.1">
+        </label>
+        <label>% Avena
+          <input type="number" id="avenaPct" value="25" step="0.1">
+        </label>
+        <label>Litros agua/kg
+          <input type="number" id="aguaKg" value="8" step="0.1">
+        </label>
+      </div>
+
+      <div class="row">
+        <label>% Yeso
+          <input type="number" id="yesoPct" value="2" step="0.1">
+        </label>
+        <label>% Carbonato
+          <input type="number" id="calPct" value="1" step="0.1">
+        </label>
+        <label>Capacidad Tarro (L)
+          <input type="number" id="capTarro" value="10" step="0.1">
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Densidad (kg/L)
+          <input type="number" id="densidad" value="0.65" step="0.01">
+        </label>
+      </div>
+
+      <button type="button" onclick="calcularPasteurizacion()">Calcular</button>
+
+      <div class="calculations" id="resultadoPasteurizacion"></div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer>
+  <small>Proyecto Producción Hongos Ostra</small>
+</footer>
+
+<script src="app.js" defer></script>
+
+</body>
+</html>
