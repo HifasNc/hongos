@@ -39,6 +39,30 @@ function calcularPasteurizacion() {
     <p>Tarros estimados: <strong>${tarros.toFixed(0)}</strong></p>
   `;
 }
+function calcularEncalado() {
+  const cantidadTarros = Number(document.getElementById("tarrosEncalado").value) || 0;
+  const volumenPorTarro = Number(document.getElementById("volumenTarroEncalado").value) || 0;
+  const spawnPct = Number(document.getElementById("spawnEncaladoPct").value) || 0;
+  const aguaEncalado = Number(document.getElementById("aguaEncalado").value) || 0;
+  const gramosCalLitro = Number(document.getElementById("gramosCalLitro").value) || 0;
+
+  const volumenTotalSustrato = cantidadTarros * volumenPorTarro;
+  const spawnNecesarioKg = volumenTotalSustrato * (spawnPct / 100);
+  const calNecesariaKg = (aguaEncalado * gramosCalLitro) / 1000;
+
+  // Referencia rápida para hongos ostra: ~0.10 a 0.20 kg frescos por litro de sustrato preparado.
+  const produccionMinKg = volumenTotalSustrato * 0.1;
+  const produccionMaxKg = volumenTotalSustrato * 0.2;
+
+  document.getElementById("resultadoEncalado").innerHTML = `
+    <h3>Resultados automáticos</h3>
+    <p>Volumen total de sustrato: <strong>${volumenTotalSustrato.toFixed(2)} L</strong></p>
+    <p>Spawn necesario (aprox): <strong>${spawnNecesarioKg.toFixed(2)} kg</strong></p>
+    <p>Cal necesaria: <strong>${calNecesariaKg.toFixed(2)} kg</strong></p>
+    <p>Producción estimada mínima: <strong>${produccionMinKg.toFixed(2)} kg</strong></p>
+    <p>Producción estimada máxima: <strong>${produccionMaxKg.toFixed(2)} kg</strong></p>
+  `;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("entryForm");
@@ -150,4 +174,5 @@ document.addEventListener("DOMContentLoaded", () => {
   loadEntries();
   renderEntries();
   calcularPasteurizacion();
+  calcularEncalado();
 });
