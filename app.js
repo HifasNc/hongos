@@ -1,66 +1,148 @@
-// ================================
-// ESPERAR QUE CARGUE EL DOM
-// ================================
-document.addEventListener("DOMContentLoaded", function () {
+const STORAGE_KEY = "hongosEntries";
 
-  // ================================
-  // 🔹 1. SISTEMA DE PESTAÑAS
-  // ================================
-  const tabs = document.querySelectorAll(".tab-btn");
-  const sections = document.querySelectorAll(".tab-section");
+function showTab(tabName) {
+  const isRegistro = tabName === "registro";
 
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
+  document.getElementById("registroTab").style.display = isRegistro ? "block" : "none";
+  document.getElementById("calculadoraTab").style.display = isRegistro ? "none" : "block";
 
-      // Quitar clase activa a todos
-      tabs.forEach(t => t.classList.remove("bg-blue-600", "text-white"));
-      sections.forEach(s => s.classList.add("hidden"));
+  document.getElementById("tabRegistro").classList.toggle("active", isRegistro);
+  document.getElementById("tabCalculadora").classList.toggle("active", !isRegistro);
+}
 
-      // Activar actual
-      tab.classList.add("bg-blue-600", "text-white");
-      const target = tab.dataset.target;
-      document.getElementById(target).classList.remove("hidden");
+function calcularPasteurizacion() {
+  const paja = Number(document.getElementById("paja").value) || 0;
+  const avenaPct = Number(document.getElementById("avenaPct").value) || 0;
+  const aguaKg = Number(document.getElementById("aguaKg").value) || 0;
+  const yesoPct = Number(document.getElementById("yesoPct").value) || 0;
+  const calPct = Number(document.getElementById("calPct").value) || 0;
+  const capTarro = Number(document.getElementById("capTarro").value) || 0;
+  const densidad = Number(document.getElementById("densidad").value) || 0;
+
+  const avenaKg = paja * (avenaPct / 100);
+  const aguaLitros = paja * aguaKg;
+  const yesoKg = paja * (yesoPct / 100);
+  const calKg = paja * (calPct / 100);
+
+  const mezclaKg = paja + avenaKg + yesoKg + calKg;
+  const volumenLitros = densidad > 0 ? mezclaKg / densidad : 0;
+  const tarros = capTarro > 0 ? volumenLitros / capTarro : 0;
+
+  document.getElementById("resultadoPasteurizacion").innerHTML = `
+    <h3>Resultado</h3>
+    <p>Avena: <strong>${avenaKg.toFixed(2)} kg</strong></p>
+    <p>Agua: <strong>${aguaLitros.toFixed(2)} L</strong></p>
+    <p>Yeso: <strong>${yesoKg.toFixed(2)} kg</strong></p>
+    <p>Carbonato: <strong>${calKg.toFixed(2)} kg</strong></p>
+    <p>Mezcla estimada: <strong>${mezclaKg.toFixed(2)} kg</strong></p>
+    <p>Volumen estimado: <strong>${volumenLitros.toFixed(2)} L</strong></p>
+    <p>Tarros estimados: <strong>${tarros.toFixed(0)}</strong></p>
+  `;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("entryForm");
+  const clearBtn = document.getElementById("clearBtn");
+  const tableBody = document.querySelector("#entriesTable tbody");
+
+  const fields = {
+    fecha: document.getElementById("fecha"),
+    lote: document.getElementById("lote"),
+    tarros: document.getElementById("tarros"),
+    peso: document.getElementById("peso"),
+    humedad: document.getElementById("humedad"),
+    obs: document.getElementById("obs"),
+  };
+
+  let entries = [];
+
+  const saveEntries = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  };
+
+  const updateTotals = () => {
+    const totalEntradas = entries.length;
+    const totalPeso = entries.reduce((sum, entry) => sum + entry.peso, 0);
+    const totalTarros = entries.reduce((sum, entry) => sum + entry.tarros, 0);
+    const promedio = totalTarros > 0 ? totalPeso / totalTarros : 0;
+
+    document.getElementById("totalEntradas").textContent = `Entradas: ${totalEntradas}`;
+    document.getElementById("totalPeso").textContent = `Peso total: ${totalPeso.toFixed(2)} kg`;
+    document.getElementById("pesoPromedio").textContent = `Promedio por tarro: ${promedio.toFixed(3)} kg`;
+  };
+
+  const renderEntries = () => {
+    tableBody.innerHTML = "";
+
+    entries.forEach((entry, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${entry.fecha}</td>
+        <td>${entry.lote || "-"}</td>
+        <td>${entry.tarros}</td>
+        <td>${entry.peso.toFixed(2)} kg</td>
+        <td>${entry.humedad !== null ? `${entry.humedad}%` : "-"}</td>
+        <td>${entry.obs || "-"}</td>
+        <td><button type="button" data-index="${index}">Eliminar</button></td>
+      `;
+      tableBody.appendChild(row);
     });
+
+    updateTotals();
+  };
+
+  const loadEntries = () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        entries = parsed.map((entry) => ({
+          ...entry,
+          tarros: Number(entry.tarros) || 0,
+          peso: Number(entry.peso) || 0,
+          humedad: entry.humedad === null || entry.humedad === "" ? null : Number(entry.humedad),
+        }));
+      }
+    } catch {
+      entries = [];
+    }
+  };
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const entry = {
+      fecha: fields.fecha.value,
+      lote: fields.lote.value.trim(),
+      tarros: Number(fields.tarros.value) || 0,
+      peso: Number(fields.peso.value) || 0,
+      humedad: fields.humedad.value === "" ? null : Number(fields.humedad.value),
+      obs: fields.obs.value.trim(),
+    };
+
+    entries.unshift(entry);
+    saveEntries();
+    renderEntries();
+    form.reset();
   });
 
-  // ================================
-  // 🔹 2. GUARDADO AUTOMÁTICO
-  // ================================
-  const inputs = document.querySelectorAll("input, select, textarea");
+  clearBtn.addEventListener("click", () => form.reset());
 
-  function guardarDatos() {
-    let datos = {};
+  tableBody.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-index]");
+    if (!button) return;
 
-    inputs.forEach(input => {
-      if (input.id) {
-        datos[input.id] = input.value;
-      }
-    });
+    const index = Number(button.dataset.index);
+    if (!Number.isInteger(index)) return;
 
-    localStorage.setItem("registroHongos", JSON.stringify(datos));
-  }
-
-  inputs.forEach(input => {
-    input.addEventListener("input", guardarDatos);
+    entries.splice(index, 1);
+    saveEntries();
+    renderEntries();
   });
 
-  // ================================
-  // 🔹 3. CARGAR DATOS AL INICIAR
-  // ================================
-  function cargarDatos() {
-    const datosGuardados = localStorage.getItem("registroHongos");
-
-    if (!datosGuardados) return;
-
-    const datos = JSON.parse(datosGuardados);
-
-    inputs.forEach(input => {
-      if (input.id && datos[input.id] !== undefined) {
-        input.value = datos[input.id];
-      }
-    });
-  }
-
-  cargarDatos();
-
+  loadEntries();
+  renderEntries();
+  calcularPasteurizacion();
 });
