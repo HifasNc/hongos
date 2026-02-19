@@ -155,3 +155,19 @@ footer{
     grid-template-columns:1fr
   }
 }
+/* ========================= */
+/* 🔹 MEJORAS VISUALES */
+/* ========================= */
+
+button:hover {
+  opacity: 0.9;
+  transition: 0.2s;
+}
+
+.tabs button:hover {
+  background: #334155;
+}
+
+table tbody tr:hover {
+  background: #0f172a;
+}
