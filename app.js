@@ -83,7 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${entry.peso.toFixed(2)} kg</td>
         <td>${entry.humedad !== null ? `${entry.humedad}%` : "-"}</td>
         <td>${entry.obs || "-"}</td>
-        <td><button type="button" data-index="${index}">Eliminar</button></td>
+        <td>
+  <button type="button" class="action-btn" data-index="${index}">
+    Eliminar
+  </button>
+</td>
+
       `;
       tableBody.appendChild(row);
     });
