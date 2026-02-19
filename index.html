@@ -131,6 +131,35 @@
       <div class="calculations" id="resultadoPasteurizacion"></div>
     </section>
 
+     <section class="form-section">
+      <h2>Calculadora - Pasteurización alcalina</h2>
+
+      <div class="row">
+        <label>Cantidad de tarros (10 L)
+          <input type="number" id="tarrosEncalado" value="20" min="0" step="1">
+        </label>
+        <label>Volumen por tarro (L)
+          <input type="number" id="volumenTarroEncalado" value="10" min="0" step="0.1">
+        </label>
+      </div>
+
+      <div class="row">
+        <label>Porcentaje de spawn (%)
+          <input type="number" id="spawnEncaladoPct" value="5" min="0" step="0.1">
+        </label>
+        <label>Litros de agua para encalado
+          <input type="number" id="aguaEncalado" value="150" min="0" step="0.1">
+        </label>
+        <label>Gramos de cal por litro
+          <input type="number" id="gramosCalLitro" value="10" min="0" step="0.1">
+        </label>
+      </div>
+
+      <button type="button" onclick="calcularEncalado()">Calcular encalado</button>
+
+      <div class="calculations" id="resultadoEncalado"></div>
+    </section>
+
   </div>
 
 </main>
