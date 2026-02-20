@@ -73,6 +73,8 @@ function calcularEncalado() {
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("entryForm");
   const clearBtn = document.getElementById("clearBtn");
+  const addSustratoBtn = document.getElementById("addSustratoBtn");
+  const sustratosContainer = document.getElementById("sustratosContainer");
   const tableBody = document.querySelector("#entriesTable tbody");
 
   if (form && clearBtn && tableBody) {
@@ -81,14 +83,65 @@ document.addEventListener("DOMContentLoaded", () => {
       hora: document.getElementById("hora"),
       hongo: document.getElementById("hongo"),
       cepa: document.getElementById("cepa"),
-      tipoSustrato: document.getElementById("tipoSustrato"),
-      pesoSeco: document.getElementById("pesoSeco"),
-      nutrientes: document.getElementById("nutrientes"),
       humectacion: document.getElementById("humectacion"),
       esterilizacion: document.getElementById("esterilizacion"),
       tiempoProceso: document.getElementById("tiempoProceso"),
       obs: document.getElementById("obs"),
-      obs: document.getElementById("obs"),
+       };
+
+    const createSustratoBlock = (index) => {
+      const block = document.createElement("div");
+      block.className = "block-card substrate-block";
+      block.dataset.substrateIndex = String(index);
+      block.innerHTML = `
+        <div class="substrate-header">
+          <h4>Sustrato ${index + 1}</h4>
+          <button type="button" class="remove-substrate-btn">Eliminar</button>
+        </div>
+        <div class="row">
+          <label>Tipo de Sustrato<input type="text" name="tipoSustrato" placeholder="Ej: Paja de trigo" required /></label>
+          <label>Peso Seco (kg)<input type="number" name="pesoSeco" min="0" step="0.01" placeholder="Ej: 10" required /></label>
+        </div>
+        <label class="full">Nutrientes Adicionales<input type="text" name="nutrientes" placeholder="Ej: Salvado de trigo, yeso" /></label>
+      `;
+      return block;
+    };
+
+    const normalizeSubstrateHeadings = () => {
+      const blocks = sustratosContainer.querySelectorAll(".substrate-block");
+      blocks.forEach((block, index) => {
+        block.dataset.substrateIndex = String(index);
+        const heading = block.querySelector("h4");
+        if (!heading) return;
+        heading.textContent = index === 0 ? "Sustrato base" : `Sustrato ${index + 1}`;
+      });
+    };
+
+    const getSustratosFromForm = () => {
+      const blocks = sustratosContainer.querySelectorAll(".substrate-block");
+      return Array.from(blocks)
+        .map((block) => {
+          const tipo = block.querySelector('input[name="tipoSustrato"]')?.value.trim() || "";
+          const pesoSeco = Number(block.querySelector('input[name="pesoSeco"]')?.value) || 0;
+          const nutrientes = block.querySelector('input[name="nutrientes"]')?.value.trim() || "";
+
+          return { tipoSustrato: tipo, pesoSeco, nutrientes };
+        })
+        .filter((sustrato) => sustrato.tipoSustrato || sustrato.pesoSeco > 0 || sustrato.nutrientes);
+    };
+
+    const resetSustratos = () => {
+      const blocks = sustratosContainer.querySelectorAll(".substrate-block");
+      blocks.forEach((block, index) => {
+        if (index === 0) {
+          block.querySelectorAll("input").forEach((input) => {
+            input.value = "";
+          });
+        } else {
+          block.remove();
+        }
+      });
+      normalizeSubstrateHeadings();
     };
 
     let entries = [];
@@ -108,13 +161,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       entries.forEach((entry, index) => {
         const row = document.createElement("tr");
+         const sustratos = Array.isArray(entry.sustratos)
+          ? entry.sustratos
+          : [{
+              tipoSustrato: entry.tipoSustrato || "-",
+              pesoSeco: Number(entry.pesoSeco) || 0,
+              nutrientes: entry.nutrientes || "",
+            }];
+        const sustratoTexto = sustratos
+          .map((sustrato) => sustrato.tipoSustrato || "-")
+          .join(", ");
+        const pesoTotal = sustratos.reduce((acc, sustrato) => acc + (Number(sustrato.pesoSeco) || 0), 0);
+
         row.innerHTML = `
           <td>${entry.fecha}</td>
        <td>${entry.hora}</td>
           <td>${entry.hongo}</td>
           <td>${entry.cepa}</td>
-          <td>${entry.tipoSustrato}</td>
-          <td>${entry.pesoSeco.toFixed(2)} kg</td>   
+        <td>${sustratoTexto}</td>
+          <td>${pesoTotal.toFixed(2)} kg</td>   
  <td>${entry.obs || "-"}</td>
           <td>
             <button type="button" class="action-btn" data-index="${index}">
@@ -138,6 +203,13 @@ document.addEventListener("DOMContentLoaded", () => {
           entries = parsed.map((entry) => ({
             ...entry,
             pesoSeco: Number(entry.pesoSeco) || 0,
+            sustratos: Array.isArray(entry.sustratos)
+              ? entry.sustratos.map((sustrato) => ({
+                  tipoSustrato: sustrato.tipoSustrato || "",
+                  pesoSeco: Number(sustrato.pesoSeco) || 0,
+                  nutrientes: sustrato.nutrientes || "",
+                }))
+              : undefined,
           }));
         }
       } catch {
@@ -148,14 +220,20 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
 
+      const sustratos = getSustratosFromForm();
+      if (sustratos.length === 0) {
+        return;
+      }
+
       const entry = {
         fecha: fields.fecha.value,
         hora: fields.hora.value,
         hongo: fields.hongo.value.trim(),
         cepa: fields.cepa.value.trim(),
-        tipoSustrato: fields.tipoSustrato.value.trim(),
-        pesoSeco: Number(fields.pesoSeco.value) || 0,
-        nutrientes: fields.nutrientes.value.trim(),
+        tipoSustrato: sustratos[0].tipoSustrato,
+        pesoSeco: sustratos[0].pesoSeco,
+        nutrientes: sustratos[0].nutrientes,
+        sustratos,
         humectacion: Number(fields.humectacion.value) || 0,
         esterilizacion: fields.esterilizacion.value.trim(),
         tiempoProceso: fields.tiempoProceso.value,
@@ -166,9 +244,30 @@ document.addEventListener("DOMContentLoaded", () => {
       saveEntries();
       renderEntries();
       form.reset();
+        resetSustratos();
     });
 
-    clearBtn.addEventListener("click", () => form.reset());
+    clearBtn.addEventListener("click", () => {
+      form.reset();
+      resetSustratos();
+    });
+
+    addSustratoBtn?.addEventListener("click", () => {
+      const nextIndex = sustratosContainer.querySelectorAll(".substrate-block").length;
+      sustratosContainer.appendChild(createSustratoBlock(nextIndex));
+      normalizeSubstrateHeadings();
+    });
+
+    sustratosContainer?.addEventListener("click", (event) => {
+      const button = event.target.closest(".remove-substrate-btn");
+      if (!button) return;
+
+      const block = button.closest(".substrate-block");
+      if (!block) return;
+
+      block.remove();
+      normalizeSubstrateHeadings();
+    });
 
     tableBody.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-index]");
