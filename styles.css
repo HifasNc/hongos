@@ -58,7 +58,7 @@ main{
   width:100%
 }
 
-block-card{
+.block-card{
   border:1px solid #1f2937;
   border-radius:8px;
   padding:12px;
@@ -68,6 +68,22 @@ block-card{
 
 .block-card h4{
   margin-top:0;
+}
+
+.substrate-actions{
+  margin:8px 0 12px;
+}
+
+.substrate-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.remove-substrate-btn{
+  background:#7f1d1d;
+  color:#fff;
 }
 
 input, 
