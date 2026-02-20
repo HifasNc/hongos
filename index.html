@@ -295,7 +295,7 @@
 
   <div id="fructificacionTab" style="display:none;">
     <section class="form-section">
-      <h2>🍄 Fructificación</h2>
+     <h2>🍄 Fructificación</h2>
 
       <label>Fecha ingreso:</label>
       <input type="date" id="fechaIngreso">
@@ -314,6 +314,11 @@
       <input type="number" id="kgFlush" step="0.1">
 
       <button type="button" onclick="agregarFlush()">Agregar Cosecha</button>
+
+      <button onclick="exportarJSON()"
+        class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-xl mt-4">
+        📦 Exportar Registro Completo
+      </button>
 
       <div id="resumenFructificacion"></div>
     </section>
