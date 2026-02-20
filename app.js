@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       esterilizacion: document.getElementById("esterilizacion"),
       tiempoProceso: document.getElementById("tiempoProceso"),
       obs: document.getElementById("obs"),
-       };
+    };
 
     const createSustratoBlock = (index) => {
       const block = document.createElement("div");
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       entries.forEach((entry, index) => {
         const row = document.createElement("tr");
-         const sustratos = Array.isArray(entry.sustratos)
+        const sustratos = Array.isArray(entry.sustratos)
           ? entry.sustratos
           : [{
               tipoSustrato: entry.tipoSustrato || "-",
@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
        <td>${entry.hora}</td>
           <td>${entry.hongo}</td>
           <td>${entry.cepa}</td>
-        <td>${sustratoTexto}</td>
+          <td>${sustratoTexto}</td>
           <td>${pesoTotal.toFixed(2)} kg</td>   
  <td>${entry.obs || "-"}</td>
           <td>
@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
       saveEntries();
       renderEntries();
       form.reset();
-        resetSustratos();
+      resetSustratos();
     });
 
     clearBtn.addEventListener("click", () => {
@@ -289,3 +289,4 @@ document.addEventListener("DOMContentLoaded", () => {
   calcularPasteurizacion();
   calcularEncalado();
 });
+;
