@@ -115,12 +115,13 @@
               <label>Tipo de Sustrato<input type="text" name="tipoSustrato" placeholder="Ej: Paja de trigo" required /></label>
               <label>Peso Seco (kg)<input type="number" name="pesoSeco" min="0" step="0.01" placeholder="Ej: 10" required /></label>
             </div>
-            <label class="full">Nutrientes Adicionales<input type="text" name="nutrientes" placeholder="Ej: Salvado de trigo, yeso" /></label>equired /></label>
+            <label class="full">Nutrientes Adicionales<input type="text" name="nutrientes" placeholder="Ej: Salvado de trigo, yeso" /></label>
           </div>
-          </div>
+        </div>
 
         <div class="substrate-actions">
           <button type="button" id="addSustratoBtn">+ Añadir sustrato</button>
+        </div>
 
         <div class="block-card">
           <h4>Procesamiento del Sustrato</h4>
@@ -168,7 +169,26 @@
   <div id="inoculacionTab" style="display:none;">
     <section class="form-section">
       <h2>Inoculación</h2>
-      <p>Espacio listo para registrar actividades y controles de inoculación.</p>
+
+      <div class="block-card">
+        <div class="row">
+          <label>ID del Lote
+            <input type="text" id="loteId" placeholder="Ej: LOTE-001" />
+          </label>
+          <label>Nº de Unidades
+            <input type="number" id="numeroUnidades" min="0" step="1" placeholder="Ej: 120" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Método de inoculación
+            <input type="text" id="metodoInoculacion" placeholder="Ej: Capa por capa" />
+          </label>
+          <label>Ratio Inóculo
+            <input type="text" id="ratioInoculo" placeholder="Ej: 1:5" />
+          </label>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -195,3 +215,4 @@
 
 </body>
 </html>
+
