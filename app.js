@@ -285,6 +285,73 @@ document.addEventListener("DOMContentLoaded", () => {
     renderEntries();
   }
 
+  const incubacionFields = {
+    cantidadUnidades: document.getElementById("cantidadUnidadesIncubacion"),
+    pesoHumedoUnidad: document.getElementById("pesoHumedoUnidad"),
+    colonizacionEstimada: document.getElementById("colonizacionEstimada"),
+    bolsasContaminadas: document.getElementById("bolsasContaminadas"),
+    descarteLote: document.getElementById("descarteLote"),
+    diasColonizacionTotal: document.getElementById("diasColonizacionTotal"),
+    semaforoEstado: document.getElementById("semaforoEstado"),
+    promedioColonizacion: document.getElementById("promedioColonizacion"),
+    eficienciaLote: document.getElementById("eficienciaLote"),
+    tasaContaminacion: document.getElementById("tasaContaminacion"),
+  };
+
+  const updateIncubacionMetricas = () => {
+    const cantidadUnidades = Number(incubacionFields.cantidadUnidades?.value) || 0;
+    const colonizacionEstimada = Number(incubacionFields.colonizacionEstimada?.value) || 0;
+    const bolsasContaminadas = Number(incubacionFields.bolsasContaminadas?.value) || 0;
+    const descarteLoteManual = Number(incubacionFields.descarteLote?.value) || 0;
+    const diasColonizacionTotal = Number(incubacionFields.diasColonizacionTotal?.value) || 0;
+
+    const tasaContaminacion = cantidadUnidades > 0
+      ? (bolsasContaminadas / cantidadUnidades) * 100
+      : 0;
+    const descarteLote = descarteLoteManual > 0 ? descarteLoteManual : tasaContaminacion;
+    const eficienciaLote = Math.max(0, 100 - descarteLote);
+
+    let semaforo = "🟢 Colonización normal";
+    if (
+      colonizacionEstimada < 60 ||
+      tasaContaminacion >= 15 ||
+      descarteLote >= 15
+    ) {
+      semaforo = "🔴 Posible contaminación";
+    } else if (
+      colonizacionEstimada < 85 ||
+      tasaContaminacion >= 5 ||
+      descarteLote >= 5
+    ) {
+      semaforo = "🟡 Lenta";
+    }
+
+    if (incubacionFields.semaforoEstado) {
+      incubacionFields.semaforoEstado.textContent = semaforo;
+    }
+    if (incubacionFields.promedioColonizacion) {
+      incubacionFields.promedioColonizacion.textContent = `Tiempo promedio de colonización: ${diasColonizacionTotal.toFixed(0)} días`;
+    }
+    if (incubacionFields.eficienciaLote) {
+      incubacionFields.eficienciaLote.textContent = `% de eficiencia del lote: ${eficienciaLote.toFixed(2)}%`;
+    }
+    if (incubacionFields.tasaContaminacion) {
+      incubacionFields.tasaContaminacion.textContent = `Tasa de contaminación: ${tasaContaminacion.toFixed(2)}%`;
+    }
+  };
+
+  [
+    incubacionFields.cantidadUnidades,
+    incubacionFields.colonizacionEstimada,
+    incubacionFields.bolsasContaminadas,
+    incubacionFields.descarteLote,
+    incubacionFields.diasColonizacionTotal,
+  ].forEach((field) => {
+    field?.addEventListener("input", updateIncubacionMetricas);
+  });
+
+  updateIncubacionMetricas();
+
   showTab("calculadora");
   calcularPasteurizacion();
   calcularEncalado();
