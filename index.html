@@ -195,7 +195,101 @@
   <div id="incubacionTab" style="display:none;">
     <section class="form-section">
       <h2>Incubación</h2>
-      <p>Espacio listo para registrar seguimiento de incubación por lote.</p>
+      <div class="block-card">
+        <div class="row">
+          <label>Cantidad de bolsas o tarros
+            <input type="number" id="cantidadUnidadesIncubacion" min="0" step="1" placeholder="Ej: 100" />
+          </label>
+          <label>Peso húmedo por unidad (kg)
+            <input type="number" id="pesoHumedoUnidad" min="0" step="0.01" placeholder="Ej: 1.2" />
+          </label>
+        </div>
+      </div>
+
+      <div class="block-card">
+        <h4>1- Condiciones ambientales (diarias o cada control)</h4>
+        <div class="row">
+          <label>🌡 Temperatura ambiente (°C)
+            <input type="number" id="tempAmbiente" step="0.1" placeholder="Ej: 24" />
+          </label>
+          <label>💧 Humedad relativa (%)
+            <input type="number" id="humedadRelativa" min="0" max="100" step="0.1" placeholder="Ej: 70" />
+          </label>
+        </div>
+        <div class="row">
+          <label>🌬 Ventilación (sí/no o nivel)
+            <input type="text" id="ventilacionIncubacion" placeholder="Ej: Sí / Media" />
+          </label>
+          <label>🌑 Luz (oscuridad / baja luz)
+            <input type="text" id="luzIncubacion" placeholder="Ej: Oscuridad" />
+          </label>
+        </div>
+        <p class="hint">Sugerido ideal para <strong>Pleurotus ostreatus</strong>: Temperatura ideal <strong>20–26°C</strong>, Humedad <strong>65–75%</strong>, sin luz directa.</p>
+      </div>
+
+      <div class="block-card">
+        <h4>2- Seguimiento de Colonización</h4>
+        <div class="row">
+          <label>Día desde inoculación
+            <input type="number" id="diaDesdeInoculacion" min="0" step="1" placeholder="Ej: 12" />
+          </label>
+          <label>% de colonización estimado
+            <input type="number" id="colonizacionEstimada" min="0" max="100" step="0.1" placeholder="Ej: 75" />
+          </label>
+        </div>
+        <fieldset class="checklist-fieldset">
+          <legend>Observaciones visuales</legend>
+          <label><input type="checkbox" id="obsMicelioUniforme" /> Micelio blanco uniforme ✔</label>
+          <label><input type="checkbox" id="obsManchasVerdes" /> Manchas verdes (Trichoderma)</label>
+          <label><input type="checkbox" id="obsManchasNegras" /> Manchas negras</label>
+          <label><input type="checkbox" id="obsOlorExtrano" /> Olor extraño</label>
+          <label><input type="checkbox" id="obsExcesoHumedad" /> Exceso de humedad</label>
+        </fieldset>
+      </div>
+
+      <div class="block-card">
+        <h4>3- Control de Contaminación</h4>
+        <div class="row">
+          <label>Número de bolsas o tarros contaminades
+            <input type="number" id="bolsasContaminadas" min="0" step="1" placeholder="Ej: 8" />
+          </label>
+          <label>Tipo de contaminación
+            <input type="text" id="tipoContaminacion" placeholder="Ej: Trichoderma" />
+          </label>
+        </div>
+        <div class="row">
+          <label>% de descarte del lote
+            <input type="number" id="descarteLote" min="0" max="100" step="0.1" placeholder="Ej: 8" />
+          </label>
+          <label>Acción tomada (aislamiento / eliminación)
+            <input type="text" id="accionTomada" placeholder="Ej: Aislamiento" />
+          </label>
+        </div>
+      </div>
+
+      <div class="block-card">
+        <h4>4- Tiempo Total de Incubación</h4>
+        <div class="row">
+          <label>Fecha fin de incubación
+            <input type="date" id="fechaFinIncubacion" />
+          </label>
+          <label>Días totales hasta 100% colonización
+            <input type="number" id="diasColonizacionTotal" min="0" step="1" placeholder="Ej: 18" />
+          </label>
+        </div>
+        <label class="full">Observación final del lote
+          <textarea id="observacionFinalLote" placeholder="Describe estado final del lote"></textarea>
+        </label>
+      </div>
+
+      <div class="calculations" id="incubacionResumen">
+        <h3>Semáforo automático</h3>
+        <p id="semaforoEstado">🟢 Colonización normal</p>
+        <h3>Cálculo automático</h3>
+        <p id="promedioColonizacion">Tiempo promedio de colonización: 0 días</p>
+        <p id="eficienciaLote">% de eficiencia del lote: 100.00%</p>
+        <p id="tasaContaminacion">Tasa de contaminación: 0.00%</p>
+      </div>
     </section>
   </div>
 
