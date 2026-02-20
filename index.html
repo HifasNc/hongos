@@ -108,14 +108,19 @@
 
         <h3>Sustrato</h3>
 
-        <div class="block-card">
-          <h4>Sustrato 1</h4>
-          <div class="row">
-            <label>Tipo de Sustrato<input type="text" id="tipoSustrato" placeholder="Ej: Paja de trigo" required /></label>
-            <label>Peso Seco (kg)<input type="number" id="pesoSeco" min="0" step="0.01" placeholder="Ej: 10" required /></label>
+        <div id="sustratosContainer">
+          <div class="block-card substrate-block" data-substrate-index="0">
+            <h4>Sustrato base</h4>
+            <div class="row">
+              <label>Tipo de Sustrato<input type="text" name="tipoSustrato" placeholder="Ej: Paja de trigo" required /></label>
+              <label>Peso Seco (kg)<input type="number" name="pesoSeco" min="0" step="0.01" placeholder="Ej: 10" required /></label>
+            </div>
+            <label class="full">Nutrientes Adicionales<input type="text" name="nutrientes" placeholder="Ej: Salvado de trigo, yeso" /></label>equired /></label>
           </div>
-          <label class="full">Nutrientes Adicionales<input type="text" id="nutrientes" placeholder="Ej: Salvado de trigo, yeso" /></label>
-        </div>
+          </div>
+
+        <div class="substrate-actions">
+          <button type="button" id="addSustratoBtn">+ Añadir sustrato</button>
 
         <div class="block-card">
           <h4>Procesamiento del Sustrato</h4>
