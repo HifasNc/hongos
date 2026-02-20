@@ -50,6 +50,20 @@ function calcularFructificacion(pesoSeco) {
     `;
   }
 }
+function exportarJSON() {
+  const dataStr = JSON.stringify(activeBatch, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = `lote_${activeBatch.id || "registro"}.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
