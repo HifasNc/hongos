@@ -78,10 +78,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (form && clearBtn && tableBody) {
     const fields = {
       fecha: document.getElementById("fecha"),
-      lote: document.getElementById("lote"),
-      tarros: document.getElementById("tarros"),
-      peso: document.getElementById("peso"),
-      humedad: document.getElementById("humedad"),
+      hora: document.getElementById("hora"),
+      hongo: document.getElementById("hongo"),
+      cepa: document.getElementById("cepa"),
+      tipoSustrato: document.getElementById("tipoSustrato"),
+      pesoSeco: document.getElementById("pesoSeco"),
+      nutrientes: document.getElementById("nutrientes"),
+      humectacion: document.getElementById("humectacion"),
+      esterilizacion: document.getElementById("esterilizacion"),
+      tiempoProceso: document.getElementById("tiempoProceso"),
+      obs: document.getElementById("obs"),
       obs: document.getElementById("obs"),
     };
 
@@ -93,14 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const updateTotals = () => {
       const totalEntradas = entries.length;
-      const totalPeso = entries.reduce((sum, entry) => sum + entry.peso, 0);
-      const totalTarros = entries.reduce((sum, entry) => sum + entry.tarros, 0);
-      const promedio = totalTarros > 0 ? totalPeso / totalTarros : 0;
-
+     
       document.getElementById("totalEntradas").textContent = `Entradas: ${totalEntradas}`;
-      document.getElementById("totalPeso").textContent = `Peso total: ${totalPeso.toFixed(2)} kg`;
-      document.getElementById("pesoPromedio").textContent = `Promedio por tarro: ${promedio.toFixed(3)} kg`;
-    };
+          };
 
     const renderEntries = () => {
       tableBody.innerHTML = "";
@@ -109,11 +110,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${entry.fecha}</td>
-          <td>${entry.lote || "-"}</td>
-          <td>${entry.tarros}</td>
-          <td>${entry.peso.toFixed(2)} kg</td>
-          <td>${entry.humedad !== null ? `${entry.humedad}%` : "-"}</td>
-          <td>${entry.obs || "-"}</td>
+       <td>${entry.hora}</td>
+          <td>${entry.hongo}</td>
+          <td>${entry.cepa}</td>
+          <td>${entry.tipoSustrato}</td>
+          <td>${entry.pesoSeco.toFixed(2)} kg</td>   
+ <td>${entry.obs || "-"}</td>
           <td>
             <button type="button" class="action-btn" data-index="${index}">
               Eliminar
@@ -135,9 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (Array.isArray(parsed)) {
           entries = parsed.map((entry) => ({
             ...entry,
-            tarros: Number(entry.tarros) || 0,
-            peso: Number(entry.peso) || 0,
-            humedad: entry.humedad === null || entry.humedad === "" ? null : Number(entry.humedad),
+            pesoSeco: Number(entry.pesoSeco) || 0,
           }));
         }
       } catch {
@@ -150,10 +150,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const entry = {
         fecha: fields.fecha.value,
-        lote: fields.lote.value.trim(),
-        tarros: Number(fields.tarros.value) || 0,
-        peso: Number(fields.peso.value) || 0,
-        humedad: fields.humedad.value === "" ? null : Number(fields.humedad.value),
+        hora: fields.hora.value,
+        hongo: fields.hongo.value.trim(),
+        cepa: fields.cepa.value.trim(),
+        tipoSustrato: fields.tipoSustrato.value.trim(),
+        pesoSeco: Number(fields.pesoSeco.value) || 0,
+        nutrientes: fields.nutrientes.value.trim(),
+        humectacion: Number(fields.humectacion.value) || 0,
+        esterilizacion: fields.esterilizacion.value.trim(),
+        tiempoProceso: fields.tiempoProceso.value,
         obs: fields.obs.value.trim(),
       };
 
@@ -185,4 +190,3 @@ document.addEventListener("DOMContentLoaded", () => {
   calcularPasteurizacion();
   calcularEncalado();
 });
-
