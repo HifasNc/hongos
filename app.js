@@ -2,6 +2,54 @@ const STORAGE_KEY = "hongosEntries";
 
 const TAB_KEYS = ["calculadora", "preparacion", "inoculacion", "incubacion", "fructificacion"];
 
+const activeBatch = {
+  fructificacion: {
+    fechaIngreso: "",
+    fechaInicioPrimordios: "",
+    flushes: [],
+    totalKg: 0,
+    rendimientoBiologico: 0,
+  },
+};
+
+function agregarFlush() {
+  const numero = parseInt(document.getElementById("flushNumero")?.value, 10);
+  const kg = parseFloat(document.getElementById("kgFlush")?.value);
+  const pesoSeco = parseFloat(document.getElementById("pesoSeco")?.value);
+
+  if (!numero || !kg || !pesoSeco) {
+    alert("Completar todos los campos");
+    return;
+  }
+
+  activeBatch.fructificacion.flushes.push({
+    numero,
+    kg,
+  });
+
+  calcularFructificacion(pesoSeco);
+}
+
+function calcularFructificacion(pesoSeco) {
+  const totalKg = activeBatch.fructificacion.flushes
+    .reduce((sum, f) => sum + f.kg, 0);
+
+  const rendimiento = (totalKg / pesoSeco) * 100;
+
+  activeBatch.fructificacion.totalKg = totalKg;
+  activeBatch.fructificacion.rendimientoBiologico = rendimiento;
+
+  const fechaIngreso = document.getElementById("fechaIngreso")?.value || "";
+  activeBatch.fructificacion.fechaIngreso = fechaIngreso;
+
+  const resumen = document.getElementById("resumenFructificacion");
+  if (resumen) {
+    resumen.innerHTML = `
+      <p><strong>Total producido:</strong> ${totalKg.toFixed(2)} kg</p>
+      <p><strong>Rendimiento biológico:</strong> ${rendimiento.toFixed(2)} %</p>
+    `;
+  }
+}
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
