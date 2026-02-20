@@ -58,6 +58,18 @@ main{
   width:100%
 }
 
+block-card{
+  border:1px solid #1f2937;
+  border-radius:8px;
+  padding:12px;
+  margin:12px 0;
+  background:#0f172a;
+}
+
+.block-card h4{
+  margin-top:0;
+}
+
 input, 
 textarea{
   width:100%; 
