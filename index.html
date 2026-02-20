@@ -98,13 +98,32 @@
       <form id="entryForm">
         <div class="row">
           <label>Fecha<input type="date" id="fecha" required /></label>
-          <label>Lote<input type="text" id="lote" placeholder="Lote / ID" /></label>
+          <label>Hora<input type="time" id="hora" required /></label>
         </div>
 
         <div class="row">
-          <label>Tarros<input type="number" id="tarros" min="0" required /></label>
-          <label>Peso Seco (kg)<input type="number" id="peso" min="0" step="0.01" required /></label>
-          <label>Humedad (%)<input type="number" id="humedad" min="0" max="100" step="0.1" /></label>
+          <label>Hongo<input type="text" id="hongo" placeholder="Ej: Pleurotus ostreatus" required /></label>
+          <label>Cepa<input type="text" id="cepa" placeholder="Ej: Mx-01" required /></label>
+        </div>
+
+        <h3>Sustrato</h3>
+
+        <div class="block-card">
+          <h4>Sustrato 1</h4>
+          <div class="row">
+            <label>Tipo de Sustrato<input type="text" id="tipoSustrato" placeholder="Ej: Paja de trigo" required /></label>
+            <label>Peso Seco (kg)<input type="number" id="pesoSeco" min="0" step="0.01" placeholder="Ej: 10" required /></label>
+          </div>
+          <label class="full">Nutrientes Adicionales<input type="text" id="nutrientes" placeholder="Ej: Salvado de trigo, yeso" /></label>
+        </div>
+
+        <div class="block-card">
+          <h4>Procesamiento del Sustrato</h4>
+          <div class="row">
+            <label>Tiempo de Humectación (horas)<input type="number" id="humectacion" min="0" step="0.1" placeholder="Ej: 12" required /></label>
+            <label>Tipo de Esterilización<input type="text" id="esterilizacion" placeholder="Ej: Pasteurización alcalina" required /></label>
+            <label>Tiempo (horas y minutos)<input type="time" id="tiempoProceso" required /></label>
+          </div>
         </div>
 
         <label class="full">Observaciones<textarea id="obs"></textarea></label>
@@ -118,9 +137,7 @@
       <div class="calculations">
         <h3>Totales</h3>
         <p id="totalEntradas">Entradas: 0</p>
-        <p id="totalPeso">Peso total: 0 kg</p>
-        <p id="pesoPromedio">Promedio por tarro: 0 kg</p>
-      </div>
+       </div>
     </section>
 
     <section class="table-section">
@@ -129,10 +146,11 @@
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Lote</th>
-            <th>Tarros</th>
-            <th>Peso</th>
-            <th>Humedad</th>
+             <th>Hora</th>
+            <th>Hongo</th>
+            <th>Cepa</th>
+            <th>Sustrato</th>
+            <th>Peso seco</th>
             <th>Obs</th>
             <th>Acción</th>
           </tr>
