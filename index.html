@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro Producción - Hongos Ostra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">🍄</div>
+    <div>
+      <h1>REGISTRO DE PRODUCCIÓN</h1>
+      <p class="subtitle">Control integral · Hongos Ostra</p>
+    </div>
+    <div class="header-badge">v2.0</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button onclick="showTab('calculadora')" id="tabCalculadora" class="active"><span class="tab-icon">⚗️</span>Calculadora</button>
+  <button onclick="showTab('preparacion')" id="tabPreparacion"><span class="tab-icon">🌾</span>Preparación</button>
+  <button onclick="showTab('inoculacion')" id="tabInoculacion"><span class="tab-icon">💉</span>Inoculación</button>
+  <button onclick="showTab('incubacion')" id="tabIncubacion"><span class="tab-icon">🌡</span>Incubación</button>
+  <button onclick="showTab('fructificacion')" id="tabFructificacion"><span class="tab-icon">🍄</span>Fructificación</button>
+</div>
+
+<main>
+
+  <!-- ===================== CALCULADORA ===================== -->
+  <div id="calculadoraTab">
+    <div class="two-col">
+
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">MÉTODO 01</span>
+          <h2>Pasteurización Agua Caliente</h2>
+        </div>
+
+        <div class="row">
+          <label>Kilos paja
+            <input type="number" id="paja" value="100" step="0.1">
+          </label>
+          <label>% Avena
+            <input type="number" id="avenaPct" value="25" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>Litros agua/kg
+            <input type="number" id="aguaKg" value="8" step="0.1">
+          </label>
+          <label>% Yeso
+            <input type="number" id="yesoPct" value="2" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>% Carbonato
+            <input type="number" id="calPct" value="1" step="0.1">
+          </label>
+          <label>Capacidad Tarro (L)
+            <input type="number" id="capTarro" value="10" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>Densidad (kg/L)
+            <input type="number" id="densidad" value="0.65" step="0.01">
+          </label>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="calcularPasteurizacion()">→ Calcular</button>
+
+        <div class="result-box" id="resultadoPasteurizacion"></div>
+      </section>
+
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">MÉTODO 02</span>
+          <h2>Pasteurización Alcalina</h2>
+        </div>
+
+        <div class="row">
+          <label>Cantidad de tarros (10 L)
+            <input type="number" id="tarrosEncalado" value="20" min="0" step="1">
+          </label>
+          <label>Volumen por tarro (L)
+            <input type="number" id="volumenTarroEncalado" value="10" min="0" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>% de spawn
+            <input type="number" id="spawnEncaladoPct" value="5" min="0" step="0.1">
+          </label>
+          <label>Litros de agua (encalado)
+            <input type="number" id="aguaEncalado" value="150" min="0" step="0.1">
+          </label>
+        </div>
+        <div class="row">
+          <label>Gramos de cal por litro
+            <input type="number" id="gramosCalLitro" value="10" min="0" step="0.1">
+          </label>
+        </div>
+
+        <button type="button" class="btn-primary" onclick="calcularEncalado()">→ Calcular encalado</button>
+
+        <div class="result-box" id="resultadoEncalado"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ===================== PREPARACIÓN ===================== -->
+  <div id="preparacionTab" style="display:none;">
+    <div class="two-col">
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">REGISTRO</span>
+          <h2>Preparación de Sustrato</h2>
+        </div>
+
+        <form id="entryForm">
+          <div class="row">
+            <label>Fecha<input type="date" id="fecha" required /></label>
+            <label>Hora<input type="time" id="hora" required /></label>
+          </div>
+          <div class="row">
+            <label>Hongo<input type="text" id="hongo" placeholder="Pleurotus ostreatus" required /></label>
+            <label>Cepa<input type="text" id="cepa" placeholder="Mx-01" required /></label>
+          </div>
+
+          <div class="block-label">SUSTRATO</div>
+
+          <div id="sustratosContainer">
+            <div class="block-card substrate-block" data-substrate-index="0">
+              <h4>Sustrato base</h4>
+              <div class="row">
+                <label>Tipo de Sustrato<input type="text" name="tipoSustrato" placeholder="Paja de trigo" required /></label>
+                <label>Peso Seco (kg)<input type="number" name="pesoSeco" min="0" step="0.01" placeholder="10" required /></label>
+              </div>
+              <label class="full">Nutrientes Adicionales<input type="text" name="nutrientes" placeholder="Salvado de trigo, yeso" /></label>
+            </div>
+          </div>
+          <!-- sustratosContainer closes here; new substrates are appended inside it via JS -->
+
+          <div class="substrate-actions">
+            <button type="button" class="btn-secondary" id="addSustratoBtn">+ Añadir sustrato</button>
+          </div>
+
+          <div class="block-card">
+            <div class="block-label">PROCESAMIENTO</div>
+            <div class="row">
+              <label>Humectación (h)<input type="number" id="humectacion" min="0" step="0.1" placeholder="12" required /></label>
+              <label>Tipo de Esterilización<input type="text" id="esterilizacion" placeholder="Pasteurización alcalina" required /></label>
+              <label>Tiempo<input type="time" id="tiempoProceso" required /></label>
+            </div>
+          </div>
+
+          <label class="full">Observaciones<textarea id="obs" rows="3"></textarea></label>
+
+          <div class="actions">
+            <button type="submit" class="btn-primary">Guardar registro</button>
+            <button type="button" class="btn-ghost" id="clearBtn">Limpiar</button>
+          </div>
+        </form>
+
+        <div class="stat-pill" style="margin-top:12px;">
+          <span id="totalEntradas">Entradas: 0</span>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <div class="section-header">
+          <span class="section-tag">HISTORIAL</span>
+          <h2>Registros guardados</h2>
+        </div>
+        <div class="table-wrapper">
+          <table id="entriesTable">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Hongo</th>
+                <th>Cepa</th>
+                <th>Sustrato</th>
+                <th>Peso</th>
+                <th>Obs</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== INOCULACIÓN ===================== -->
+  <div id="inoculacionTab" style="display:none;">
+    <section class="form-section form-section--wide">
+      <div class="section-header">
+        <span class="section-tag">PROCESO</span>
+        <h2>Inoculación</h2>
+      </div>
+
+      <div class="block-card">
+        <div class="row">
+          <label>ID del Lote
+            <input type="text" id="loteId" placeholder="LOTE-001" />
+          </label>
+          <label>Nº de Unidades
+            <input type="number" id="numeroUnidades" min="0" step="1" placeholder="120" />
+          </label>
+        </div>
+        <div class="row">
+          <label>Método de inoculación
+            <input type="text" id="metodoInoculacion" placeholder="Capa por capa" />
+          </label>
+          <label>Ratio Inóculo
+            <input type="text" id="ratioInoculo" placeholder="1:5" />
+          </label>
+        </div>
+      </div>
+      <p class="hint">💡 Registrá los datos clave del lote para hacer seguimiento desde la inoculación.</p>
+    </section>
+  </div>
+
+  <!-- ===================== INCUBACIÓN ===================== -->
+  <div id="incubacionTab" style="display:none;">
+    <div class="two-col">
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">MONITOREO</span>
+          <h2>Incubación</h2>
+        </div>
+
+        <div class="block-card">
+          <div class="row">
+            <label>Cantidad de unidades
+              <input type="number" id="cantidadUnidadesIncubacion" min="0" step="1" placeholder="100" />
+            </label>
+            <label>Peso húmedo por unidad (kg)
+              <input type="number" id="pesoHumedoUnidad" min="0" step="0.01" placeholder="1.2" />
+            </label>
+          </div>
+        </div>
+
+        <div class="block-card">
+          <div class="block-label">CONDICIONES AMBIENTALES</div>
+          <div class="row">
+            <label>🌡 Temperatura (°C)
+              <input type="number" id="tempAmbiente" step="0.1" placeholder="24" />
+            </label>
+            <label>💧 Humedad relativa (%)
+              <input type="number" id="humedadRelativa" min="0" max="100" step="0.1" placeholder="70" />
+            </label>
+          </div>
+          <div class="row">
+            <label>🌬 Ventilación
+              <input type="text" id="ventilacionIncubacion" placeholder="Sí / Media" />
+            </label>
+            <label>🌑 Luz
+              <input type="text" id="luzIncubacion" placeholder="Oscuridad" />
+            </label>
+          </div>
+          <p class="hint">Ideal para <strong>P. ostreatus</strong>: 20–26 °C · 65–75% HR · sin luz directa.</p>
+        </div>
+
+        <div class="block-card">
+          <div class="block-label">COLONIZACIÓN</div>
+          <div class="row">
+            <label>Día desde inoculación
+              <input type="number" id="diaDesdeInoculacion" min="0" step="1" placeholder="12" />
+            </label>
+            <label>% colonización estimado
+              <input type="number" id="colonizacionEstimada" min="0" max="100" step="0.1" placeholder="75" />
+            </label>
+          </div>
+          <fieldset class="checklist-fieldset">
+            <legend>Observaciones visuales</legend>
+            <label><input type="checkbox" id="obsMicelioUniforme" /> Micelio blanco uniforme ✔</label>
+            <label><input type="checkbox" id="obsManchasVerdes" /> Manchas verdes (Trichoderma)</label>
+            <label><input type="checkbox" id="obsManchasNegras" /> Manchas negras</label>
+            <label><input type="checkbox" id="obsOlorExtrano" /> Olor extraño</label>
+            <label><input type="checkbox" id="obsExcesoHumedad" /> Exceso de humedad</label>
+          </fieldset>
+        </div>
+
+        <div class="block-card">
+          <div class="block-label">CONTROL DE CONTAMINACIÓN</div>
+          <div class="row">
+            <label>Unidades contaminadas
+              <input type="number" id="bolsasContaminadas" min="0" step="1" placeholder="8" />
+            </label>
+            <label>Tipo de contaminación
+              <input type="text" id="tipoContaminacion" placeholder="Trichoderma" />
+            </label>
+          </div>
+          <div class="row">
+            <label>% de descarte
+              <input type="number" id="descarteLote" min="0" max="100" step="0.1" placeholder="8" />
+            </label>
+            <label>Acción tomada
+              <input type="text" id="accionTomada" placeholder="Aislamiento" />
+            </label>
+          </div>
+        </div>
+
+        <div class="block-card">
+          <div class="block-label">TIEMPO TOTAL</div>
+          <div class="row">
+            <label>Fecha fin de incubación
+              <input type="date" id="fechaFinIncubacion" />
+            </label>
+            <label>Días hasta 100% colonización
+              <input type="number" id="diasColonizacionTotal" min="0" step="1" placeholder="18" />
+            </label>
+          </div>
+          <label class="full">Observación final del lote
+            <textarea id="observacionFinalLote" placeholder="Describe estado final del lote" rows="3"></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">MÉTRICAS</span>
+          <h2>Semáforo automático</h2>
+        </div>
+
+        <div class="semaforo-card">
+          <div id="semaforoEstado" class="semaforo-text">🟢 Colonización normal</div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Tiempo colonización</div>
+            <div class="metric-value" id="promedioColonizacion">0 días</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Eficiencia del lote</div>
+            <div class="metric-value" id="eficienciaLote">100.00%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Tasa contaminación</div>
+            <div class="metric-value" id="tasaContaminacion">0.00%</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== FRUCTIFICACIÓN ===================== -->
+  <div id="fructificacionTab" style="display:none;">
+    <div class="two-col">
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">COSECHA</span>
+          <h2>Fructificación</h2>
+        </div>
+
+        <div class="block-card">
+          <div class="row">
+            <label>Fecha ingreso
+              <input type="date" id="fechaIngreso">
+            </label>
+            <label>Peso seco total (kg)
+              <input type="number" id="pesoSeco" step="0.01" placeholder="Ej: 50">
+            </label>
+          </div>
+        </div>
+
+        <div class="block-card">
+          <div class="block-label">REGISTRAR FLUSH</div>
+          <div class="row">
+            <label>N° Flush
+              <input type="number" id="flushNumero" min="1" placeholder="1">
+            </label>
+            <label>Kg cosechados
+              <input type="number" id="kgFlush" step="0.1" placeholder="0.0">
+            </label>
+          </div>
+          <button type="button" class="btn-primary" onclick="agregarFlush()">+ Agregar cosecha</button>
+        </div>
+
+        <div id="resumenFructificacion" class="result-box"></div>
+
+        <button type="button" class="btn-secondary" style="margin-top:12px;" onclick="exportarJSON()">📦 Exportar JSON</button>
+      </section>
+
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">FLUSHES</span>
+          <h2>Historial de cosechas</h2>
+        </div>
+        <div id="flushList" class="flush-list">
+          <p class="empty-msg">No hay cosechas registradas aún.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <small>🍄 Proyecto Producción Hongos Ostra &nbsp;·&nbsp; <span id="footerYear"></span></small>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>
