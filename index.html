@@ -277,25 +277,58 @@
         <h2>Inoculación</h2>
       </div>
 
+      <!-- LOTES -->
       <div class="block-card">
+        <div class="block-label">IDENTIFICACIÓN DEL LOTE</div>
         <div class="row">
-          <label>ID del Lote
+          <label>ID del Lote de tarros o bolsas
             <input type="text" id="loteId" placeholder="LOTE-001" />
           </label>
           <label>Nº de Unidades
             <input type="number" id="numeroUnidades" min="0" step="1" placeholder="120" />
           </label>
         </div>
+      </div>
+
+      <!-- MICELIO -->
+      <div class="block-card">
+        <div class="block-label">MICELIO / SPAWN</div>
         <div class="row">
-          <label>Método de inoculación
-            <input type="text" id="metodoInoculacion" placeholder="Capa por capa" />
+          <label>ID del Lote de micelio
+            <input type="text" id="loteMicelio" placeholder="MICELIO-001" />
           </label>
-          <label>Ratio Inóculo
-            <input type="text" id="ratioInoculo" placeholder="1:5" />
+          <label>Cantidad a usar
+            <div class="input-with-unit">
+              <input type="number" id="cantidadMicelio" min="0" step="0.1" placeholder="500" />
+              <select id="unidadMicelio">
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="L">L</option>
+              </select>
+            </div>
           </label>
         </div>
       </div>
-      <p class="hint">💡 Registrá los datos clave del lote para hacer seguimiento desde la inoculación.</p>
+
+      <!-- MÉTODO -->
+      <div class="block-card">
+        <div class="block-label">MÉTODO DE INOCULACIÓN</div>
+        <div class="inoculacion-hint-box" id="inoculacionHint">
+          <span class="hint-icon">💡</span>
+          <span id="inoculacionHintText">Seleccioná un hongo en la pestaña Preparación para ver sugerencias de métodos.</span>
+        </div>
+        <div class="row" style="margin-top:12px;">
+          <label>Método de inoculación
+            <input type="text" id="metodoInoculacion" placeholder="Capa por capa" list="metodos-list" autocomplete="off" />
+            <datalist id="metodos-list"></datalist>
+          </label>
+          <label>Ratio Inóculo
+            <input type="text" id="ratioInoculo" placeholder="Ej: 1:5 o 5%" />
+          </label>
+        </div>
+      </div>
+
     </section>
   </div>
 

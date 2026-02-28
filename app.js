@@ -1,4 +1,200 @@
 /* ========================= */
+/* MÉTODOS POR HONGO         */
+/* ========================= */
+const METODOS_POR_HONGO = {
+  "pleurotus": {
+    label: "Pleurotus spp. (Ostra)",
+    metodos: [
+      "Capa por capa (layer spawn)",
+      "Inoculación superficial en bolsa",
+      "Inoculación en tarro con tapa filtrante",
+      "Spawn en agujeros laterales de bolsa",
+      "Inoculación manual con guante estéril",
+    ],
+    ratio: "3–5% del peso seco del sustrato",
+  },
+  "lentinula edodes": {
+    label: "Shiitake",
+    metodos: [
+      "Inoculación en troncos (tacos o pastillas de micelio)",
+      "Inoculación en bolsa de aserrín compactado",
+      "Bloques de aserrín + salvado en cámara",
+      "Spawn en agujeros perforados en tronco + sellado con cera",
+    ],
+    ratio: "5–10% del peso seco del sustrato",
+  },
+  "hericium erinaceus": {
+    label: "Melena de León",
+    metodos: [
+      "Inoculación en bolsa de aserrín enriquecido",
+      "Inoculación en frasco de boca ancha (mason jar)",
+      "Bloques compactos inoculados en cámara limpia",
+      "Inoculación con jeringas de spawn líquido",
+    ],
+    ratio: "5–8% del peso del sustrato",
+  },
+  "ganoderma": {
+    label: "Reishi / Ganoderma",
+    metodos: [
+      "Inoculación en troncos frescos con tacos",
+      "Bolsas de aserrín de madera dura inoculadas",
+      "Bloques de roble + salvado en cámara estéril",
+      "Spawn de grano en sustrato compactado",
+    ],
+    ratio: "5–10% del peso del sustrato",
+  },
+  "agaricus": {
+    label: "Champiñón (Agaricus)",
+    metodos: [
+      "Spawn de grano sobre compost pasteurizado",
+      "Siembra superficial + casing de turba/cal",
+      "Inoculación volumétrica en bandejas",
+      "Spawn de paja sobre cama de compost",
+    ],
+    ratio: "1–3% del volumen del compost",
+  },
+  "flammulina velutipes": {
+    label: "Enoki",
+    metodos: [
+      "Inoculación en frascos de vidrio angostos",
+      "Bolsas de polipropileno con cuello filtrante",
+      "Bloques de aserrín + cáscara de arroz inoculados",
+    ],
+    ratio: "3–5% del peso del sustrato",
+  },
+  "trametes versicolor": {
+    label: "Cola de Pavo / Coriolus",
+    metodos: [
+      "Inoculación en troncos con tacos de madera",
+      "Bolsas de aserrín de madera dura",
+      "Bloques compactados en cámara de flujo laminar",
+    ],
+    ratio: "5–8% del peso del sustrato",
+  },
+  "inonotus obliquus": {
+    label: "Chaga",
+    metodos: [
+      "Inoculación en troncos de abedul frescos",
+      "Spawn de grano en troncos perforados",
+    ],
+    ratio: "Variable según cepa",
+  },
+  "cordyceps militaris": {
+    label: "Cordyceps",
+    metodos: [
+      "Inoculación líquida en sustrato de arroz",
+      "Spawn líquido sobre arroz parboil en frascos",
+      "Cultivo en sustrato de amaranto + maíz",
+      "Inoculación en frascos con tapa filtrante",
+    ],
+    ratio: "10–15% del volumen del sustrato",
+  },
+  "auricularia": {
+    label: "Oreja de Judas / Mu Err",
+    metodos: [
+      "Inoculación en troncos o palos frescos",
+      "Bolsas de aserrín de madera blanda",
+      "Bloques de aserrín + harina de trigo en cámara limpia",
+    ],
+    ratio: "3–5% del peso del sustrato",
+  },
+  "stropharia rugosoannulata": {
+    label: "Hongo Vino Tinto / King Stropharia",
+    metodos: [
+      "Spawn de paja sobre cama al aire libre",
+      "Inoculación directa en chips de madera húmedos",
+      "Mezcla de spawn en sustrato de paja en exterior",
+    ],
+    ratio: "5–10% del peso de la paja",
+  },
+  "hypsizygus": {
+    label: "Shimeji",
+    metodos: [
+      "Inoculación en frascos de vidrio de boca ancha",
+      "Bolsas de aserrín enriquecido con salvado",
+      "Bloques compactados en cámara estéril",
+    ],
+    ratio: "3–5% del peso del sustrato",
+  },
+  "pholiota nameko": {
+    label: "Nameko",
+    metodos: [
+      "Inoculación en troncos de madera dura frescos",
+      "Bolsas de aserrín compactado con salvado de arroz",
+      "Bloques de madera en ambiente húmedo y fresco",
+    ],
+    ratio: "5–8% del peso del sustrato",
+  },
+  "agrocybe aegerita": {
+    label: "Pioppino / Chopo",
+    metodos: [
+      "Inoculación en troncos de álamo o chopo",
+      "Bolsas de aserrín de madera blanda",
+      "Bloques de paja + aserrín inoculados en cámara",
+    ],
+    ratio: "5–8% del peso del sustrato",
+  },
+  "tremella fuciformis": {
+    label: "Tremella / Hongo Nieve",
+    metodos: [
+      "Co-inoculación con hongo hospedador (Annulohypoxylon)",
+      "Bloques de aserrín de madera dura inoculados",
+      "Inoculación en sustrato de madera + salvado en cámara estéril",
+    ],
+    ratio: "5–10% del peso del sustrato",
+  },
+  "default": {
+    label: "Hongo genérico",
+    metodos: [
+      "Capa por capa (layer spawn)",
+      "Inoculación superficial",
+      "Inoculación en profundidad",
+      "Spawn de grano mezclado",
+      "Inoculación con jeringas (spawn líquido)",
+      "Taco de micelio en ranuras",
+    ],
+    ratio: "3–10% del peso seco del sustrato",
+  },
+};
+
+function getMetodoData(hongoStr) {
+  if (!hongoStr) return METODOS_POR_HONGO["default"];
+  const lower = hongoStr.toLowerCase();
+  if (lower.includes("pleurotus")) return METODOS_POR_HONGO["pleurotus"];
+  if (lower.includes("lentinula") || lower.includes("shiitake")) return METODOS_POR_HONGO["lentinula edodes"];
+  if (lower.includes("hericium") || lower.includes("melena")) return METODOS_POR_HONGO["hericium erinaceus"];
+  if (lower.includes("ganoderma") || lower.includes("reishi")) return METODOS_POR_HONGO["ganoderma"];
+  if (lower.includes("agaricus")) return METODOS_POR_HONGO["agaricus"];
+  if (lower.includes("flammulina") || lower.includes("enoki")) return METODOS_POR_HONGO["flammulina velutipes"];
+  if (lower.includes("trametes") || lower.includes("cola de pavo")) return METODOS_POR_HONGO["trametes versicolor"];
+  if (lower.includes("inonotus") || lower.includes("chaga")) return METODOS_POR_HONGO["inonotus obliquus"];
+  if (lower.includes("cordyceps")) return METODOS_POR_HONGO["cordyceps militaris"];
+  if (lower.includes("auricularia") || lower.includes("oreja")) return METODOS_POR_HONGO["auricularia"];
+  if (lower.includes("stropharia") || lower.includes("vino tinto")) return METODOS_POR_HONGO["stropharia rugosoannulata"];
+  if (lower.includes("hypsizygus") || lower.includes("shimeji")) return METODOS_POR_HONGO["hypsizygus"];
+  if (lower.includes("pholiota") || lower.includes("nameko")) return METODOS_POR_HONGO["pholiota nameko"];
+  if (lower.includes("agrocybe") || lower.includes("pioppino") || lower.includes("chopo")) return METODOS_POR_HONGO["agrocybe aegerita"];
+  if (lower.includes("tremella") || lower.includes("nieve")) return METODOS_POR_HONGO["tremella fuciformis"];
+  return METODOS_POR_HONGO["default"];
+}
+
+function actualizarMetodosInoculacion(hongoStr) {
+  const datalist = document.getElementById("metodos-list");
+  const hintBox = document.getElementById("inoculacionHint");
+  const hintText = document.getElementById("inoculacionHintText");
+  if (!datalist) return;
+  const data = getMetodoData(hongoStr);
+  datalist.innerHTML = data.metodos.map(m => `<option value="${m}">`).join("");
+  if (hongoStr && hongoStr.trim()) {
+    hintBox && hintBox.classList.add("has-hongo");
+    if (hintText) hintText.textContent = `🍄 ${data.label} — Ratio sugerido: ${data.ratio}`;
+  } else {
+    hintBox && hintBox.classList.remove("has-hongo");
+    if (hintText) hintText.textContent = "Seleccioná un hongo en la pestaña Preparación para ver sugerencias de métodos.";
+  }
+}
+
+/* ========================= */
 /* STORAGE & STATE           */
 /* ========================= */
 const STORAGE_KEY = "hongosEntries";
@@ -436,6 +632,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("loteId")?.addEventListener("input", (e) => {
     activeBatch.id = e.target.value.trim();
   });
+
+  // Conectar campo hongo con la pestaña de Inoculación
+  const hongoInput = document.getElementById("hongo");
+  if (hongoInput) {
+    // Actualizar métodos cuando cambia el hongo
+    hongoInput.addEventListener("input", (e) => {
+      actualizarMetodosInoculacion(e.target.value);
+    });
+    // También actualizar al cambiar de pestaña a Inoculación
+    document.getElementById("tabInoculacion")?.addEventListener("click", () => {
+      actualizarMetodosInoculacion(hongoInput.value);
+    });
+    // Inicializar con valor actual (si ya hay uno guardado en el form)
+    actualizarMetodosInoculacion(hongoInput.value);
+  }
 
   // ── DEFAULT TAB & CALCS ──
   showTab("calculadora");
