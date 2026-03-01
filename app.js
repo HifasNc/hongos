@@ -798,6 +798,152 @@ function exportarJSON() {
 }
 
 /* ========================= */
+/* EXPORT CSV                */
+/* ========================= */
+function exportarCSV() {
+  const loteId     = activeBatch.id?.trim() || "—";
+  const pesoSeco   = _lastPesoSeco;
+  const flushes    = activeBatch.fructificacion.flushes;
+  const totalKg    = flushes.reduce((s, f) => s + f.kg, 0);
+  const rendBio    = pesoSeco > 0 ? (totalKg / pesoSeco * 100).toFixed(2) : "—";
+  const estado     = fructMeta.estado || "activo";
+  const fechaHoy   = new Date().toLocaleDateString("es-AR");
+
+  // Helper: escape cell for CSV (wrap in quotes if contains comma/newline/quote)
+  const esc = v => {
+    const s = String(v ?? "");
+    return s.includes(",") || s.includes('"') || s.includes("\n")
+      ? `"${s.replace(/"/g, '""')}"`
+      : s;
+  };
+
+  const rows = [];
+
+  // ── Hoja 1: RESUMEN DEL LOTE ──
+  rows.push(["=== RESUMEN DEL LOTE ==="].map(esc).join(","));
+  rows.push(["Campo", "Valor"].map(esc).join(","));
+  rows.push(["ID del Lote",               esc(loteId)]);
+  rows.push(["Fecha de exportación",      esc(fechaHoy)]);
+  rows.push(["Peso seco sustrato (kg)",   esc(pesoSeco || "—")]);
+  rows.push(["Total producido (kg)",      esc(totalKg.toFixed(3))]);
+  rows.push(["Rendimiento biológico (%)", esc(rendBio)]);
+  rows.push(["Estado del lote",           esc(estado)]);
+  rows.push(["Flushes registrados",       esc(flushes.length)]);
+  rows.push(["Flushes esperados",         esc(fructMeta.flushesEsperados || "—")]);
+
+  // Mejor flush
+  if (flushes.length > 0) {
+    const mejor = flushes.reduce((a, b) => b.kg > a.kg ? b : a);
+    rows.push(["Mejor flush",             esc(`F${mejor.numero} — ${mejor.kg.toFixed(3)} kg`)]);
+    const prom = (totalKg / flushes.length).toFixed(3);
+    rows.push(["Promedio por flush (kg)", esc(prom)]);
+  }
+
+  // Fecha ingreso y días al primer flush
+  const fechaIngreso = document.getElementById("fechaIngreso")?.value || "";
+  if (fechaIngreso) rows.push(["Fecha ingreso a sala",  esc(fechaIngreso)]);
+  if (fechaIngreso && flushes.length > 0 && flushes[0].fecha) {
+    const diff = Math.round((new Date(flushes[0].fecha) - new Date(fechaIngreso)) / 86400000);
+    if (!isNaN(diff) && diff >= 0) rows.push(["Días al primer flush", esc(diff)]);
+  }
+
+  // Intervalo promedio
+  if (flushes.length >= 2) {
+    const intervalos = [];
+    for (let i = 1; i < flushes.length; i++) {
+      if (flushes[i].fecha && flushes[i-1].fecha) {
+        const d = Math.round((new Date(flushes[i].fecha) - new Date(flushes[i-1].fecha)) / 86400000);
+        if (!isNaN(d) && d > 0) intervalos.push(d);
+      }
+    }
+    if (intervalos.length > 0) {
+      const avg = (intervalos.reduce((a, b) => a + b, 0) / intervalos.length).toFixed(1);
+      rows.push(["Intervalo promedio entre flushes (días)", esc(avg)]);
+    }
+  }
+
+  rows.push(["", ""]);
+
+  // ── Hoja 2: DETALLE DE FLUSHES ──
+  rows.push(["=== DETALLE DE FLUSHES ==="].map(esc).join(","));
+  rows.push([
+    "N° Flush", "Fecha cosecha", "Kg cosechados",
+    "% del total", "Variación vs anterior (kg)",
+    "Calidad", "Observaciones"
+  ].map(esc).join(","));
+
+  flushes.forEach((f, i) => {
+    const pctTotal = totalKg > 0 ? ((f.kg / totalKg) * 100).toFixed(1) + "%" : "—";
+    let variacion = "—";
+    if (i > 0) {
+      const delta = f.kg - flushes[i-1].kg;
+      variacion = (delta >= 0 ? "+" : "") + delta.toFixed(3);
+    }
+    rows.push([
+      esc(`F${f.numero}`),
+      esc(f.fecha || "—"),
+      esc(f.kg.toFixed(3)),
+      esc(pctTotal),
+      esc(variacion),
+      esc(f.calidad || "—"),
+      esc(f.obs || ""),
+    ].join(","));
+  });
+
+  rows.push(["", ""]);
+
+  // ── Hoja 3: CONDICIONES DE SALA ──
+  rows.push(["=== CONDICIONES DE SALA ==="].map(esc).join(","));
+  rows.push(["Campo", "Valor"].map(esc).join(","));
+  const camposSala = [
+    ["Temperatura sala (°C)",  "tempFruct"],
+    ["Humedad relativa sala (%)", "hrFruct"],
+    ["Ventilación / CO₂",     "ventFruct"],
+    ["Fotoperíodo",            "luzFruct"],
+    ["Técnica de inducción",   "tecnicaInduccion"],
+    ["Densidad de pinning",    "densidadPinning"],
+    ["Fecha primordios",       "fechaPrimordios"],
+    ["Días hasta primordios",  "diasPrimordios"],
+  ];
+  camposSala.forEach(([label, id]) => {
+    const el = document.getElementById(id);
+    const val = el?.value || "—";
+    rows.push([esc(label), esc(val)]);
+  });
+
+  // Checkboxes de pinning
+  rows.push(["", ""]);
+  rows.push(["=== OBSERVACIONES DE PINNING ==="].map(esc).join(","));
+  rows.push(["Observación", "Estado"].map(esc).join(","));
+  const checkPinning = [
+    ["Pinning uniforme",          "pinUniforme"],
+    ["Primordios sanos",          "primordiosSanos"],
+    ["Pinning lento",             "pinLento"],
+    ["Aborto de primordios",      "primordiosAborto"],
+    ["Píleo deformado (CO₂ alto)","pileoDeformado"],
+    ["Cuerpos fructíferos secos", "hongosSecos"],
+  ];
+  checkPinning.forEach(([label, id]) => {
+    const checked = document.getElementById(id)?.checked ? "Sí" : "No";
+    rows.push([esc(label), esc(checked)]);
+  });
+
+  // BOM para que Excel abra bien caracteres especiales (UTF-8)
+  const BOM = "\uFEFF";
+  const csvContent = BOM + rows.join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  const filename = loteId !== "—"
+    ? `lote_${loteId}_${new Date().toISOString().slice(0,10)}.csv`
+    : `produccion_${new Date().toISOString().slice(0,10)}.csv`;
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ========================= */
 /* FRUCTIFICACIÓN — ESTADO   */
 /* ========================= */
 function syncEstadoBotones() {
