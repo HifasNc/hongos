@@ -36,83 +36,183 @@
 
   <!-- ===================== CALCULADORA ===================== -->
   <div id="calculadoraTab">
-    <div class="two-col">
+    <div class="calc-layout">
 
-      <section class="form-section">
-        <div class="section-header">
-          <span class="section-tag">MÉTODO 01</span>
-          <h2>Pasteurización Agua Caliente</h2>
-        </div>
+      <!-- ── COLUMNA IZQUIERDA: formulario ── -->
+      <div class="calc-left">
 
-        <div class="row">
-          <label>Kilos paja
-            <input type="number" id="paja" value="100" step="0.1">
-          </label>
-          <label>% Avena
-            <input type="number" id="avenaPct" value="25" step="0.1">
-          </label>
-        </div>
-        <div class="row">
-          <label>Litros agua/kg
-            <input type="number" id="aguaKg" value="8" step="0.1">
-          </label>
-          <label>% Yeso
-            <input type="number" id="yesoPct" value="2" step="0.1">
-          </label>
-        </div>
-        <div class="row">
-          <label>% Carbonato
-            <input type="number" id="calPct" value="1" step="0.1">
-          </label>
-          <label>Capacidad Tarro (L)
-            <input type="number" id="capTarro" value="10" step="0.1">
-          </label>
-        </div>
-        <div class="row">
-          <label>Densidad (kg/L)
-            <input type="number" id="densidad" value="0.65" step="0.01">
-          </label>
-        </div>
+        <!-- TIPO DE PASTEURIZACIÓN -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">MÉTODO</span>
+            <h2>Calculadora de Pasteurización</h2>
+          </div>
+          <div class="block-card">
+            <label>Tipo de pasteurización
+              <select id="tipoPasteurizacion">
+                <option value="agua_caliente">Agua Caliente (70–80°C)</option>
+                <option value="alcalina">Alcalina / Encalado (pH 12)</option>
+                <option value="vapor">Vapor (90–100°C)</option>
+                <option value="vapor_presion">Vapor a Presión / Autoclave (121°C)</option>
+                <option value="hidratacion_fria">Hidratación en frío + Cal</option>
+              </select>
+            </label>
+            <div class="calc-metodo-hint" id="calcMetodoHint">
+              <span class="hint-icon">💡</span>
+              <span id="calcMetodoHintText"></span>
+            </div>
+          </div>
+        </section>
 
-        <button type="button" class="btn-primary" onclick="calcularPasteurizacion()">→ Calcular</button>
+        <!-- RECIPIENTES -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">RECIPIENTES</span>
+            <h2>Tipo y volumen</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Tipo de recipiente
+                <select id="tipoRecipiente">
+                  <option value="bolsa_pp">Bolsa de PP (polipropileno)</option>
+                  <option value="bolsa_pe">Bolsa de PE (polietileno)</option>
+                  <option value="tarro_10">Tarro / Cubo 10 L</option>
+                  <option value="tarro_20">Tarro / Cubo 20 L</option>
+                  <option value="tarro_personalizado">Tarro personalizado</option>
+                  <option value="bandeja">Bandeja</option>
+                  <option value="cama">Cama / Estante</option>
+                </select>
+              </label>
+              <label>Volumen por recipiente (L)
+                <input type="number" id="volumenRecipiente" step="0.1" min="0" placeholder="10">
+              </label>
+            </div>
+            <div class="row">
+              <label>Densidad de la mezcla (kg/L)
+                <input type="number" id="densidadMezcla" step="0.01" min="0" value="0.65">
+                <span class="field-hint">Paja pasteurizada ≈ 0.55–0.70 · Aserrín ≈ 0.60–0.75</span>
+              </label>
+              <label>Porcentaje de llenado (%)
+                <input type="number" id="pctLlenado" step="1" min="0" max="100" value="85">
+                <span class="field-hint">Dejar espacio para el spawn</span>
+              </label>
+            </div>
+          </div>
+        </section>
 
-        <div class="result-box" id="resultadoPasteurizacion"></div>
-      </section>
+        <!-- SUSTRATOS -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">SUSTRATOS</span>
+            <h2>Composición del sustrato</h2>
+          </div>
+          <div class="block-card">
 
-      <section class="form-section">
-        <div class="section-header">
-          <span class="section-tag">MÉTODO 02</span>
-          <h2>Pasteurización Alcalina</h2>
-        </div>
+            <!-- Sustrato 1 (base) -->
+            <div class="block-label">SUSTRATO BASE</div>
+            <div class="row" style="margin-top:8px;">
+              <label>Tipo
+                <input type="text" id="sust1Tipo" list="calc-sustratos-list" placeholder="Paja de trigo" autocomplete="off">
+                <datalist id="calc-sustratos-list">
+                  <option value="Paja de trigo">
+                  <option value="Paja de arroz">
+                  <option value="Paja de cebada">
+                  <option value="Paja de centeno">
+                  <option value="Aserrín de roble">
+                  <option value="Aserrín de eucaliptus">
+                  <option value="Aserrín de álamo">
+                  <option value="Aserrín mixto de madera dura">
+                  <option value="Mazorca de maíz triturada">
+                  <option value="Cáscara de arroz">
+                  <option value="Cáscara de girasol">
+                  <option value="Pulpa de café">
+                  <option value="Bagazo de caña">
+                  <option value="Rastrojo de maíz">
+                  <option value="Cartón corrugado molido">
+                  <option value="Heno de gramíneas">
+                </datalist>
+              </label>
+              <label>Peso seco (kg)
+                <input type="number" id="sust1Kg" step="0.1" min="0" placeholder="100">
+              </label>
+            </div>
 
-        <div class="row">
-          <label>Cantidad de tarros (10 L)
-            <input type="number" id="tarrosEncalado" value="20" min="0" step="1">
-          </label>
-          <label>Volumen por tarro (L)
-            <input type="number" id="volumenTarroEncalado" value="10" min="0" step="0.1">
-          </label>
-        </div>
-        <div class="row">
-          <label>% de spawn
-            <input type="number" id="spawnEncaladoPct" value="5" min="0" step="0.1">
-          </label>
-          <label>Litros de agua (encalado)
-            <input type="number" id="aguaEncalado" value="150" min="0" step="0.1">
-          </label>
-        </div>
-        <div class="row">
-          <label>Gramos de cal por litro
-            <input type="number" id="gramosCalLitro" value="10" min="0" step="0.1">
-          </label>
-        </div>
+            <!-- Sustrato 2 (suplemento) -->
+            <div class="block-label" style="margin-top:14px;">SUPLEMENTO 1 <span class="sugerido-tag" id="sust2Sugerido"></span></div>
+            <div class="row" style="margin-top:8px;">
+              <label>Tipo
+                <input type="text" id="sust2Tipo" list="calc-sust2-list" placeholder="Ej: Salvado de trigo" autocomplete="off">
+                <datalist id="calc-sust2-list">
+                  <option value="Salvado de trigo">
+                  <option value="Salvado de arroz">
+                  <option value="Harina de soja">
+                  <option value="Harina de maíz">
+                  <option value="Avena en copos">
+                  <option value="Semolín de trigo">
+                  <option value="Melaza de caña">
+                  <option value="Harina de alfalfa">
+                  <option value="Levadura de cerveza">
+                  <option value="Cáscara de soja">
+                </datalist>
+              </label>
+              <label>Porcentaje (% del sustrato base)
+                <input type="number" id="sust2Pct" step="0.1" min="0" max="100" placeholder="15">
+                <span class="field-hint" id="sust2KgCalc">— kg</span>
+              </label>
+            </div>
 
-        <button type="button" class="btn-primary" onclick="calcularEncalado()">→ Calcular encalado</button>
+            <!-- Sustrato 3 (suplemento 2) -->
+            <div class="block-label" style="margin-top:14px;">SUPLEMENTO 2 <span class="sugerido-tag" id="sust3Sugerido"></span></div>
+            <div class="row" style="margin-top:8px;">
+              <label>Tipo
+                <input type="text" id="sust3Tipo" list="calc-sust3-list" placeholder="Ej: Avena en copos" autocomplete="off">
+                <datalist id="calc-sust3-list">
+                  <option value="Yeso agrícola">
+                  <option value="Carbonato de calcio">
+                  <option value="Cal hidratada">
+                  <option value="Ceniza de madera">
+                  <option value="Zeolita">
+                  <option value="Cáscara de arroz (enriquecedor)">
+                  <option value="Avena en copos">
+                  <option value="Salvado fino">
+                </datalist>
+              </label>
+              <label>Porcentaje (% del sustrato base)
+                <input type="number" id="sust3Pct" step="0.1" min="0" max="100" placeholder="5">
+                <span class="field-hint" id="sust3KgCalc">— kg</span>
+              </label>
+            </div>
+          </div>
+        </section>
 
-        <div class="result-box" id="resultadoEncalado"></div>
-      </section>
+        <!-- PARÁMETROS ESPECÍFICOS DEL MÉTODO -->
+        <section class="form-section" id="seccionParametros">
+          <div class="section-header">
+            <span class="section-tag">PARÁMETROS</span>
+            <h2>Datos del proceso</h2>
+          </div>
+          <div class="block-card" id="paramBlock">
+            <!-- Se renderiza dinámicamente según el método seleccionado -->
+          </div>
+        </section>
 
-    </div>
+      </div><!-- /calc-left -->
+
+      <!-- ── COLUMNA DERECHA: resultados ── -->
+      <div class="calc-right">
+        <section class="form-section" style="position:sticky;top:16px;">
+          <div class="section-header">
+            <span class="section-tag">RESULTADOS</span>
+            <h2>Cálculo automático</h2>
+          </div>
+
+          <div class="calc-resultado-panel" id="calcResultadoPanel">
+            <p class="empty-msg">Completá los datos para ver los resultados.</p>
+          </div>
+        </section>
+      </div><!-- /calc-right -->
+
+    </div><!-- /calc-layout -->
   </div>
 
   <!-- ===================== PREPARACIÓN ===================== -->

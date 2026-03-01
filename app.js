@@ -230,63 +230,368 @@ function showTab(tabName) {
   });
 }
 
-/* ========================= */
-/* CALCULADORA - PASTEURIZACIÓN */
-/* ========================= */
-function calcularPasteurizacion() {
-  const paja = Number(document.getElementById("paja").value) || 0;
-  const avenaPct = Number(document.getElementById("avenaPct").value) || 0;
-  const aguaKg = Number(document.getElementById("aguaKg").value) || 0;
-  const yesoPct = Number(document.getElementById("yesoPct").value) || 0;
-  const calPct = Number(document.getElementById("calPct").value) || 0;
-  const capTarro = Number(document.getElementById("capTarro").value) || 0;
-  const densidad = Number(document.getElementById("densidad").value) || 0;
+/* =========================================== */
+/* CALCULADORA UNIFICADA DE PASTEURIZACIÓN     */
+/* =========================================== */
 
-  const avenaKg = paja * (avenaPct / 100);
-  const aguaLitros = paja * aguaKg;
-  const yesoKg = paja * (yesoPct / 100);
-  const calKg = paja * (calPct / 100);
-  const mezclaKg = paja + avenaKg + yesoKg + calKg;
-  const volumenLitros = densidad > 0 ? mezclaKg / densidad : 0;
-  const tarros = capTarro > 0 ? volumenLitros / capTarro : 0;
+// ── Datos por método ──
+const METODO_INFO = {
+  agua_caliente: {
+    label: "Agua Caliente (70–80°C)",
+    hint: "Se sumerge el sustrato en agua a 70–80°C durante 1–2 horas. Simple y efectiva para paja. Humedad final ≈ 65–75%.",
+    aguaLitrosPorKg: 8,       // litros de agua por kg de sustrato base para sumergir
+    tempC: "70–80°C",
+    duracion: "60–120 min",
+    spawnPctMin: 3, spawnPctMax: 6,
+    yesoSugerido: 2,           // % sobre sustrato base
+    carbonatoSugerido: 0,
+    calSugerida: 0,
+    absorcionPct: 65,          // % de humedad que absorbe el sustrato seco
+    params: [
+      { id:"p_temp", label:"Temperatura del agua (°C)", default:75, step:1, hint:"Mantener entre 70–80°C" },
+      { id:"p_tiempo", label:"Tiempo de inmersión (min)", default:90, step:5, hint:"60–120 min según densidad del sustrato" },
+    ],
+  },
+  alcalina: {
+    label: "Alcalina / Encalado (pH 12)",
+    hint: "Se hidrata el sustrato en solución de cal (pH 12) a temperatura ambiente durante 12–18h. Sin calor, bajo costo, efectiva contra bacterias.",
+    aguaLitrosPorKg: 7,
+    tempC: "Ambiente",
+    duracion: "12–18 h",
+    spawnPctMin: 3, spawnPctMax: 6,
+    yesoSugerido: 1,
+    carbonatoSugerido: 0,
+    calSugerida: 1.5,          // % cal sobre el agua (gramos por litro × litros / 1000)
+    absorcionPct: 68,
+    params: [
+      { id:"p_gCal", label:"Gramos de cal por litro de agua", default:10, step:0.5, hint:"10–12 g/L para pH ≈ 12" },
+      { id:"p_horas", label:"Tiempo de inmersión (horas)", default:14, step:1, hint:"12–18 horas" },
+    ],
+  },
+  vapor: {
+    label: "Vapor (90–100°C)",
+    hint: "Vapor a presión atmosférica sobre el sustrato durante 2–4 horas. Mayor eficiencia que agua caliente, no requiere autoclave.",
+    aguaLitrosPorKg: 1.5,     // agua generada como vapor que absorbe el sustrato
+    tempC: "90–100°C",
+    duracion: "2–4 h",
+    spawnPctMin: 3, spawnPctMax: 7,
+    yesoSugerido: 2,
+    carbonatoSugerido: 1,
+    calSugerida: 0,
+    absorcionPct: 62,
+    params: [
+      { id:"p_tiempo", label:"Tiempo de vaporización (min)", default:180, step:10, hint:"120–240 min según volumen" },
+      { id:"p_aguaVapor", label:"Agua para generar vapor (L)", default:50, step:5, hint:"Aprox. 1 L agua → 1.7 m³ vapor a 100°C" },
+    ],
+  },
+  vapor_presion: {
+    label: "Vapor a Presión / Autoclave (121°C)",
+    hint: "Esterilización completa a 121°C y 15 psi durante 2–3 horas. Usado para aserrín enriquecido. Elimina todo organismo incluyendo esporas.",
+    aguaLitrosPorKg: 0.8,
+    tempC: "121°C / 15 psi",
+    duracion: "90–180 min",
+    spawnPctMin: 2, spawnPctMax: 5,
+    yesoSugerido: 1.5,
+    carbonatoSugerido: 0.5,
+    calSugerida: 0,
+    absorcionPct: 58,
+    params: [
+      { id:"p_tiempo", label:"Tiempo a presión (min)", default:150, step:10, hint:"90–180 min según volumen de la carga" },
+      { id:"p_psi", label:"Presión (psi)", default:15, step:1, hint:"15 psi = 121°C. No bajar de 12 psi." },
+    ],
+  },
+  hidratacion_fria: {
+    label: "Hidratación en frío + Cal",
+    hint: "Sustrato seco hidratado en frío con cal por 24h. El pH alto (≥12) inhibe competidores. Más sencillo que el encalado caliente, menor eficiencia.",
+    aguaLitrosPorKg: 7.5,
+    tempC: "Ambiente (≤20°C)",
+    duracion: "18–24 h",
+    spawnPctMin: 4, spawnPctMax: 8,
+    yesoSugerido: 1,
+    carbonatoSugerido: 0,
+    calSugerida: 1.8,
+    absorcionPct: 70,
+    params: [
+      { id:"p_gCal", label:"Gramos de cal por litro", default:12, step:0.5, hint:"12–15 g/L para pH ≥ 12" },
+      { id:"p_horas", label:"Tiempo de hidratación (horas)", default:20, step:1, hint:"18–24 horas mínimo" },
+    ],
+  },
+};
 
-  document.getElementById("resultadoPasteurizacion").innerHTML = `
-    <h3>Resultado</h3>
-    <p><span>Avena</span><strong>${avenaKg.toFixed(2)} kg</strong></p>
-    <p><span>Agua</span><strong>${aguaLitros.toFixed(2)} L</strong></p>
-    <p><span>Yeso</span><strong>${yesoKg.toFixed(2)} kg</strong></p>
-    <p><span>Carbonato</span><strong>${calKg.toFixed(2)} kg</strong></p>
-    <p><span>Mezcla estimada</span><strong>${mezclaKg.toFixed(2)} kg</strong></p>
-    <p><span>Volumen estimado</span><strong>${volumenLitros.toFixed(2)} L</strong></p>
-    <p><span>Tarros estimados</span><strong>${Math.ceil(tarros)}</strong></p>
+// ── Sugeridos por tipo de sustrato base ──
+const SUST_SUGERIDOS = {
+  "paja":     { s2: { tipo:"Salvado de trigo",  pct:15 }, s3: { tipo:"Yeso agrícola",    pct:2  } },
+  "arroz":    { s2: { tipo:"Salvado de arroz",  pct:10 }, s3: { tipo:"Carbonato de calcio",pct:1 } },
+  "aserrin":  { s2: { tipo:"Salvado de trigo",  pct:20 }, s3: { tipo:"Yeso agrícola",    pct:2  } },
+  "aserrín":  { s2: { tipo:"Salvado de trigo",  pct:20 }, s3: { tipo:"Yeso agrícola",    pct:2  } },
+  "mazorca":  { s2: { tipo:"Harina de maíz",    pct:10 }, s3: { tipo:"Yeso agrícola",    pct:2  } },
+  "café":     { s2: { tipo:"Salvado de trigo",  pct:15 }, s3: { tipo:"Carbonato de calcio",pct:1 } },
+  "caña":     { s2: { tipo:"Melaza de caña",    pct:5  }, s3: { tipo:"Yeso agrícola",    pct:2  } },
+  "default":  { s2: { tipo:"Salvado de trigo",  pct:15 }, s3: { tipo:"Yeso agrícola",    pct:2  } },
+};
+
+function getSugeridoSustrato(sust1Tipo) {
+  const lower = (sust1Tipo || "").toLowerCase();
+  if (lower.includes("arroz"))   return SUST_SUGERIDOS["arroz"];
+  if (lower.includes("aserrín") || lower.includes("aserrin")) return SUST_SUGERIDOS["aserrin"];
+  if (lower.includes("mazorca") || lower.includes("maíz")) return SUST_SUGERIDOS["mazorca"];
+  if (lower.includes("café"))    return SUST_SUGERIDOS["café"];
+  if (lower.includes("caña"))    return SUST_SUGERIDOS["caña"];
+  if (lower.includes("paja"))    return SUST_SUGERIDOS["paja"];
+  return SUST_SUGERIDOS["default"];
+}
+
+// ── Volúmenes predeterminados por recipiente ──
+const VOLUMEN_RECIPIENTE = {
+  bolsa_pp: 2.5, bolsa_pe: 3.0,
+  tarro_10: 10, tarro_20: 20,
+  tarro_personalizado: 0,
+  bandeja: 20, cama: 200,
+};
+
+// ── Renderizar bloque de parámetros dinámicos ──
+function renderParamBlock() {
+  const metodo = document.getElementById("tipoPasteurizacion")?.value || "agua_caliente";
+  const info   = METODO_INFO[metodo] || METODO_INFO["agua_caliente"];
+  const block  = document.getElementById("paramBlock");
+  if (!block) return;
+
+  block.innerHTML = info.params.map(p => `
+    <div class="row" style="margin-bottom:4px;">
+      <label class="full">${p.label}
+        <input type="number" id="${p.id}" value="${p.default}" step="${p.step}" min="0">
+        <span class="field-hint">${p.hint}</span>
+      </label>
+    </div>
+  `).join("") + `
+    <div class="row" style="margin-top:8px;">
+      <label>% Spawn / Semilla de micelio
+        <input type="number" id="p_spawnPct" step="0.1" min="0" max="30"
+               value="${((info.spawnPctMin + info.spawnPctMax) / 2).toFixed(1)}">
+        <span class="field-hint">Sugerido: ${info.spawnPctMin}–${info.spawnPctMax}%</span>
+      </label>
+      <label>Yeso agrícola (% sobre sustrato base)
+        <input type="number" id="p_yesoPct" step="0.1" min="0" max="10"
+               value="${info.yesoSugerido}">
+        <span class="field-hint">Sugerido: ${info.yesoSugerido}% · Mejora estructura</span>
+      </label>
+    </div>
+    <div class="row">
+      <label>Carbonato de calcio (% sobre sustrato base)
+        <input type="number" id="p_carbonatoPct" step="0.1" min="0" max="5"
+               value="${info.carbonatoSugerido}">
+        <span class="field-hint">Sugerido: ${info.carbonatoSugerido}% · Buffer de pH</span>
+      </label>
+      ${info.calSugerida > 0 ? `
+      <label>Cal hidratada (% sobre sustrato base)
+        <input type="number" id="p_calPct" step="0.1" min="0" max="10"
+               value="${info.calSugerida}">
+        <span class="field-hint">Para pH ≥ 12</span>
+      </label>` : '<div></div>'}
+    </div>
+  `;
+
+  // Re-wire parámetros dinámicos al calcular
+  block.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calcularPasteurizacionUnificada);
+  });
+}
+
+// ── Actualizar hint y sugeridos al cambiar método o sustrato ──
+function actualizarMetodoHint() {
+  const metodo = document.getElementById("tipoPasteurizacion")?.value || "agua_caliente";
+  const info   = METODO_INFO[metodo];
+  const hintEl = document.getElementById("calcMetodoHintText");
+  if (hintEl && info) hintEl.textContent = info.hint;
+}
+
+function actualizarSugeridos() {
+  const sust1Tipo = document.getElementById("sust1Tipo")?.value || "";
+  const sug = getSugeridoSustrato(sust1Tipo);
+
+  // Mostrar sugeridos como badge
+  const s2Tag = document.getElementById("sust2Sugerido");
+  const s3Tag = document.getElementById("sust3Sugerido");
+  if (s2Tag) s2Tag.textContent = `Sugerido: ${sug.s2.tipo} (${sug.s2.pct}%)`;
+  if (s3Tag) s3Tag.textContent = `Sugerido: ${sug.s3.tipo} (${sug.s3.pct}%)`;
+
+  // Auto-completar si los campos están vacíos
+  const s2Tipo = document.getElementById("sust2Tipo");
+  const s2Pct  = document.getElementById("sust2Pct");
+  const s3Tipo = document.getElementById("sust3Tipo");
+  const s3Pct  = document.getElementById("sust3Pct");
+  if (s2Tipo && !s2Tipo.value) s2Tipo.value = sug.s2.tipo;
+  if (s2Pct  && !s2Pct.value)  s2Pct.value  = sug.s2.pct;
+  if (s3Tipo && !s3Tipo.value) s3Tipo.value = sug.s3.tipo;
+  if (s3Pct  && !s3Pct.value)  s3Pct.value  = sug.s3.pct;
+}
+
+function actualizarVolumenRecipiente() {
+  const tipo = document.getElementById("tipoRecipiente")?.value;
+  const volEl = document.getElementById("volumenRecipiente");
+  if (!volEl) return;
+  const vol = VOLUMEN_RECIPIENTE[tipo];
+  if (vol > 0) volEl.value = vol;
+  else if (!volEl.value) volEl.placeholder = "Ingresá el volumen";
+}
+
+// ── CÁLCULO PRINCIPAL ──
+function calcularPasteurizacionUnificada() {
+  const metodo = document.getElementById("tipoPasteurizacion")?.value || "agua_caliente";
+  const info   = METODO_INFO[metodo];
+
+  // Sustratos
+  const sust1Kg  = Number(document.getElementById("sust1Kg")?.value)  || 0;
+  const sust2Pct = Number(document.getElementById("sust2Pct")?.value) || 0;
+  const sust3Pct = Number(document.getElementById("sust3Pct")?.value) || 0;
+  const sust1Tipo = document.getElementById("sust1Tipo")?.value || "Sustrato base";
+  const sust2Tipo = document.getElementById("sust2Tipo")?.value || "Suplemento 1";
+  const sust3Tipo = document.getElementById("sust3Tipo")?.value || "Suplemento 2";
+
+  const sust2Kg = sust1Kg * (sust2Pct / 100);
+  const sust3Kg = sust1Kg * (sust3Pct / 100);
+
+  // Actualizar kg calculados inline
+  const s2KgEl = document.getElementById("sust2KgCalc");
+  const s3KgEl = document.getElementById("sust3KgCalc");
+  if (s2KgEl) s2KgEl.textContent = sust2Kg > 0 ? `= ${sust2Kg.toFixed(2)} kg` : "— kg";
+  if (s3KgEl) s3KgEl.textContent = sust3Kg > 0 ? `= ${sust3Kg.toFixed(2)} kg` : "— kg";
+
+  if (sust1Kg <= 0) {
+    const panel = document.getElementById("calcResultadoPanel");
+    if (panel) panel.innerHTML = `<p class="empty-msg">Ingresá los kg del sustrato base para calcular.</p>`;
+    return;
+  }
+
+  // Recipientes
+  const volRecipiente = Number(document.getElementById("volumenRecipiente")?.value) || 0;
+  const densidad      = Number(document.getElementById("densidadMezcla")?.value)    || 0.65;
+  const pctLlenado    = Number(document.getElementById("pctLlenado")?.value)         || 85;
+
+  // Parámetros del método
+  const spawnPct     = Number(document.getElementById("p_spawnPct")?.value)     || ((info.spawnPctMin + info.spawnPctMax) / 2);
+  const yesoPct      = Number(document.getElementById("p_yesoPct")?.value)      || info.yesoSugerido;
+  const carbonatoPct = Number(document.getElementById("p_carbonatoPct")?.value) || info.carbonatoSugerido;
+  const calPct       = Number(document.getElementById("p_calPct")?.value)       || 0;
+
+  // ── CÁLCULOS BASE ──
+  const sustratoSecoTotal = sust1Kg + sust2Kg + sust3Kg;
+
+  // Agua según método
+  let aguaLitros = 0;
+  if (metodo === "agua_caliente" || metodo === "alcalina" || metodo === "hidratacion_fria") {
+    // Litros de agua para inmersión total
+    aguaLitros = sust1Kg * info.aguaLitrosPorKg;
+  } else {
+    // Vapor: el sustrato absorbe humedad; calculamos agua necesaria para alcanzar humedad objetivo
+    // sustrato húmedo = seco / (1 - humedad%/100)
+    const humObjetivo = info.absorcionPct / 100;
+    aguaLitros = (sustratoSecoTotal * humObjetivo) / (1 - humObjetivo);
+    // más el agua para el generador de vapor
+    const aguaGenerador = Number(document.getElementById("p_aguaVapor")?.value) || 50;
+    aguaLitros += aguaGenerador;
+  }
+
+  // Aditivos (yeso, carbonato, cal) sobre sustrato base seco
+  const yesoKg      = sust1Kg * (yesoPct / 100);
+  const carbonatoKg = sust1Kg * (carbonatoPct / 100);
+  const calKg       = sust1Kg * (calPct / 100);
+
+  // Para alcalina/hidratacion_fria: cal se mide en g/L de agua
+  let calPorAgua = 0;
+  if ((metodo === "alcalina" || metodo === "hidratacion_fria") && aguaLitros > 0) {
+    const gCalLitro = Number(document.getElementById("p_gCal")?.value) || 10;
+    calPorAgua = (aguaLitros * gCalLitro) / 1000; // kg de cal
+  }
+  const calFinalKg = calPorAgua > 0 ? calPorAgua : calKg;
+
+  // ── PESO HÚMEDO ESTIMADO POST-PASTEURIZACIÓN ──
+  // El sustrato seco absorbe agua hasta la humedad objetivo
+  const humObjetivo = info.absorcionPct / 100;
+  const pesoHumedoSustrato = sustratoSecoTotal / (1 - humObjetivo);
+  const pesoMezclaSinSpawn = pesoHumedoSustrato + yesoKg + carbonatoKg + calFinalKg;
+
+  // ── SPAWN ──
+  const spawnKg = pesoMezclaSinSpawn * (spawnPct / 100);
+  const pesoMezclTotal = pesoMezclaSinSpawn + spawnKg;
+
+  // ── VOLUMEN TOTAL Y RECIPIENTES ──
+  const volumenTotalMezcla = densidad > 0 ? pesoMezclTotal / densidad : 0;
+  const volEfectivoRecipiente = volRecipiente * (pctLlenado / 100);
+  const cantidadRecipientes = (volRecipiente > 0 && volEfectivoRecipiente > 0)
+    ? Math.ceil(volumenTotalMezcla / volEfectivoRecipiente)
+    : 0;
+
+  // ── PRODUCCIÓN ESTIMADA ──
+  const prodMinKg = pesoMezclaSinSpawn * 0.10;
+  const prodMaxKg = pesoMezclaSinSpawn * 0.20;
+
+  // ── RENDER DE RESULTADOS ──
+  const tipoRec = document.getElementById("tipoRecipiente")?.selectedOptions[0]?.text || "recipiente";
+  const panel   = document.getElementById("calcResultadoPanel");
+  if (!panel) return;
+
+  const seccion = (title, tag, rows) => `
+    <div class="calc-res-seccion">
+      <div class="calc-res-header">
+        <span class="section-tag" style="font-size:0.6rem;">${tag}</span>
+        <span class="calc-res-title">${title}</span>
+      </div>
+      ${rows.map(([label, val, sub]) => `
+        <div class="calc-res-row">
+          <span class="calc-res-label">${label}</span>
+          <span class="calc-res-valor">${val}${sub ? `<span class="calc-res-sub"> ${sub}</span>` : ""}</span>
+        </div>`).join("")}
+    </div>`;
+
+  panel.innerHTML = `
+    <div class="calc-res-metodo">
+      <span class="calc-metodo-badge">${info.label}</span>
+      <span class="calc-metodo-params">${info.tempC} · ${info.duracion}</span>
+    </div>
+
+    ${seccion("Sustratos (peso seco)", "SUSTRATOS", [
+      [sust1Tipo || "Sustrato base",   `${sust1Kg.toFixed(2)} kg`, "base"],
+      sust2Kg > 0 ? [sust2Tipo || "Suplemento 1", `${sust2Kg.toFixed(2)} kg`, `(${sust2Pct}%)`] : null,
+      sust3Kg > 0 ? [sust3Tipo || "Suplemento 2", `${sust3Kg.toFixed(2)} kg`, `(${sust3Pct}%)`] : null,
+      ["Total sustrato seco",           `${sustratoSecoTotal.toFixed(2)} kg`, ""],
+    ].filter(Boolean))}
+
+    ${seccion("Agua y aditivos", "AGUA / ADITIVOS", [
+      ["Agua necesaria",               `${aguaLitros.toFixed(1)} L`,  metodo === "agua_caliente" ? "para inmersión" : metodo === "vapor" ? "total (absorción + generador)" : "para hidratación"],
+      yesoKg > 0      ? ["Yeso agrícola",     `${yesoKg.toFixed(2)} kg`,      `(${yesoPct}%)`] : null,
+      carbonatoKg > 0 ? ["Carbonato de calcio", `${carbonatoKg.toFixed(2)} kg`, `(${carbonatoPct}%)`] : null,
+      calFinalKg > 0  ? ["Cal hidratada",     `${calFinalKg.toFixed(2)} kg`,  metodo==="alcalina"||metodo==="hidratacion_fria" ? "según g/L" : `(${calPct}%)`] : null,
+    ].filter(Boolean))}
+
+    ${seccion("Semilla de micelio (spawn)", "SPAWN", [
+      ["Spawn necesario",   `${spawnKg.toFixed(2)} kg`, `(${spawnPct}% sobre mezcla húmeda)`],
+      ["Rango recomendado", `${(pesoMezclaSinSpawn * info.spawnPctMin / 100).toFixed(2)}–${(pesoMezclaSinSpawn * info.spawnPctMax / 100).toFixed(2)} kg`,
+        `(${info.spawnPctMin}–${info.spawnPctMax}%)`],
+    ])}
+
+    ${seccion("Mezcla post-pasteurización", "MEZCLA HÚMEDA", [
+      ["Peso húmedo del sustrato",  `${pesoHumedoSustrato.toFixed(2)} kg`, `(humedad ≈ ${info.absorcionPct}%)`],
+      ["Peso total con spawn",      `${pesoMezclTotal.toFixed(2)} kg`, ""],
+      ["Volumen estimado mezcla",   `${volumenTotalMezcla.toFixed(1)} L`, `(densidad ${densidad} kg/L)`],
+    ])}
+
+    ${volRecipiente > 0 ? seccion("Recipientes estimados", "RECIPIENTES", [
+      ["Volumen efectivo/recipiente", `${volEfectivoRecipiente.toFixed(1)} L`, `(${pctLlenado}% de ${volRecipiente} L)`],
+      ["Cantidad de recipientes",     `${cantidadRecipientes}`, `${tipoRec}`],
+      cantidadRecipientes > 0 ? ["Peso aprox./recipiente",  `${(pesoMezclTotal / cantidadRecipientes).toFixed(2)} kg`, ""] : null,
+    ].filter(Boolean)) : ""}
+
+    ${seccion("Producción estimada", "PRODUCCIÓN", [
+      ["Rendimiento biológico min.",  `${prodMinKg.toFixed(2)} kg`, "(10%)"],
+      ["Rendimiento biológico max.",  `${prodMaxKg.toFixed(2)} kg`, "(20%)"],
+    ])}
   `;
 }
 
-/* ========================= */
-/* CALCULADORA - ALCALINA    */
-/* ========================= */
-function calcularEncalado() {
-  const cantidadTarros = Number(document.getElementById("tarrosEncalado").value) || 0;
-  const volumenPorTarro = Number(document.getElementById("volumenTarroEncalado").value) || 0;
-  const spawnPct = Number(document.getElementById("spawnEncaladoPct").value) || 0;
-  const aguaEncalado = Number(document.getElementById("aguaEncalado").value) || 0;
-  const gramosCalLitro = Number(document.getElementById("gramosCalLitro").value) || 0;
-
-  const volumenTotalSustrato = cantidadTarros * volumenPorTarro;
-  const spawnNecesarioKg = volumenTotalSustrato * (spawnPct / 100);
-  const calNecesariaKg = (aguaEncalado * gramosCalLitro) / 1000;
-  const produccionMinKg = volumenTotalSustrato * 0.1;
-  const produccionMaxKg = volumenTotalSustrato * 0.2;
-
-  document.getElementById("resultadoEncalado").innerHTML = `
-    <h3>Resultados automáticos</h3>
-    <p><span>Volumen total sustrato</span><strong>${volumenTotalSustrato.toFixed(2)} L</strong></p>
-    <p><span>Spawn necesario (aprox)</span><strong>${spawnNecesarioKg.toFixed(2)} kg</strong></p>
-    <p><span>Cal necesaria</span><strong>${calNecesariaKg.toFixed(2)} kg</strong></p>
-    <p><span>Producción mínima estimada</span><strong>${produccionMinKg.toFixed(2)} kg</strong></p>
-    <p><span>Producción máxima estimada</span><strong>${produccionMaxKg.toFixed(2)} kg</strong></p>
-  `;
-}
+// Alias para compatibilidad con DOMContentLoaded (se llaman al final)
+function calcularPasteurizacion() { calcularPasteurizacionUnificada(); }
+function calcularEncalado()        { /* ya no se usa separado */ }
 
 /* ========================= */
 /* RANGOS FRUCTIFICACIÓN     */
@@ -1609,16 +1914,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   syncEstadoBotones();
 
-  // ── DEFAULT TAB & CALCS ──
-  showTab("calculadora");
-  calcularPasteurizacion();
-  calcularEncalado();
+  // ── CALCULADORA UNIFICADA ──
 
-  // Auto-recalculate on input
-  ["paja", "avenaPct", "aguaKg", "yesoPct", "calPct", "capTarro", "densidad"].forEach(id => {
-    document.getElementById(id)?.addEventListener("input", calcularPasteurizacion);
+  // Inicializar hint, sugeridos, volumen, params y calcular
+  actualizarMetodoHint();
+  actualizarVolumenRecipiente();
+  renderParamBlock();
+  actualizarSugeridos();
+  calcularPasteurizacionUnificada();
+
+  // Cambio de método → re-render params + recalcular
+  document.getElementById("tipoPasteurizacion")?.addEventListener("change", () => {
+    actualizarMetodoHint();
+    renderParamBlock();
+    calcularPasteurizacionUnificada();
   });
-  ["tarrosEncalado", "volumenTarroEncalado", "spawnEncaladoPct", "aguaEncalado", "gramosCalLitro"].forEach(id => {
-    document.getElementById(id)?.addEventListener("input", calcularEncalado);
+
+  // Cambio de recipiente → auto-completar volumen
+  document.getElementById("tipoRecipiente")?.addEventListener("change", () => {
+    actualizarVolumenRecipiente();
+    calcularPasteurizacionUnificada();
   });
+
+  // Cambio de sustrato base → actualizar sugeridos + recalcular
+  document.getElementById("sust1Tipo")?.addEventListener("input", () => {
+    actualizarSugeridos();
+    calcularPasteurizacionUnificada();
+  });
+
+  // Todos los inputs fijos del formulario
+  [
+    "sust1Kg", "sust2Tipo", "sust2Pct", "sust3Tipo", "sust3Pct",
+    "volumenRecipiente", "densidadMezcla", "pctLlenado",
+  ].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", calcularPasteurizacionUnificada);
+  });
+
+  // ── DEFAULT TAB ──
+  showTab("calculadora");
 });
