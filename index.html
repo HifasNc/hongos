@@ -141,7 +141,10 @@
             <div class="block-label" style="margin-top:14px;">SUPLEMENTO 1 <span class="sugerido-tag" id="sust2Sugerido"></span></div>
             <div class="row" style="margin-top:8px;">
               <label>Tipo
-                <input type="text" id="sust2Tipo" list="calc-sust2-list" placeholder="Ej: Salvado de trigo" autocomplete="off">
+                <div class="sust-input-wrap">
+                  <input type="text" id="sust2Tipo" list="calc-sust2-list" placeholder="Ej: Salvado de trigo" autocomplete="off">
+                  <button type="button" class="btn-guardar-sust" id="btnGuardarSust2" title="Guardar este suplemento en mi lista">＋ Guardar</button>
+                </div>
                 <datalist id="calc-sust2-list">
                   <option value="Salvado de trigo">
                   <option value="Salvado de arroz">
@@ -160,12 +163,17 @@
                 <span class="field-hint" id="sust2KgCalc">— kg</span>
               </label>
             </div>
+            <!-- Lista de suplementos guardados S2 -->
+            <div id="sust2CustomList" class="custom-sust-chips"></div>
 
             <!-- Sustrato 3 (suplemento 2) -->
             <div class="block-label" style="margin-top:14px;">SUPLEMENTO 2 <span class="sugerido-tag" id="sust3Sugerido"></span></div>
             <div class="row" style="margin-top:8px;">
               <label>Tipo
-                <input type="text" id="sust3Tipo" list="calc-sust3-list" placeholder="Ej: Avena en copos" autocomplete="off">
+                <div class="sust-input-wrap">
+                  <input type="text" id="sust3Tipo" list="calc-sust3-list" placeholder="Ej: Avena en copos" autocomplete="off">
+                  <button type="button" class="btn-guardar-sust" id="btnGuardarSust3" title="Guardar este suplemento en mi lista">＋ Guardar</button>
+                </div>
                 <datalist id="calc-sust3-list">
                   <option value="Yeso agrícola">
                   <option value="Carbonato de calcio">
@@ -182,6 +190,8 @@
                 <span class="field-hint" id="sust3KgCalc">— kg</span>
               </label>
             </div>
+            <!-- Lista de suplementos guardados S3 -->
+            <div id="sust3CustomList" class="custom-sust-chips"></div>
           </div>
         </section>
 

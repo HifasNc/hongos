@@ -234,6 +234,152 @@ function showTab(tabName) {
 /* CALCULADORA UNIFICADA DE PASTEURIZACIÓN     */
 /* =========================================== */
 
+// ── Base de datos de suplementos personalizados ──
+const CUSTOM_SUST_KEY = "hongosCustomSuplementos";
+
+// Listas predeterminadas (para no duplicar al guardar)
+const SUST_DEFAULT_S2 = new Set([
+  "Salvado de trigo","Salvado de arroz","Harina de soja","Harina de maíz",
+  "Avena en copos","Semolín de trigo","Melaza de caña","Harina de alfalfa",
+  "Levadura de cerveza","Cáscara de soja",
+]);
+const SUST_DEFAULT_S3 = new Set([
+  "Yeso agrícola","Carbonato de calcio","Cal hidratada","Ceniza de madera",
+  "Zeolita","Cáscara de arroz (enriquecedor)","Avena en copos","Salvado fino",
+]);
+
+function loadCustomSuplementos() {
+  try {
+    const saved = localStorage.getItem(CUSTOM_SUST_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return { s2: [], s3: [] };
+}
+
+function saveCustomSuplementos(data) {
+  localStorage.setItem(CUSTOM_SUST_KEY, JSON.stringify(data));
+}
+
+function agregarSuplemento(slot, valor) {
+  const v = valor.trim();
+  if (!v) return;
+  const data = loadCustomSuplementos();
+  const lista = data[slot] || [];
+  // Verificar que no esté ya (en defaults o en customs)
+  const defaultSet = slot === "s2" ? SUST_DEFAULT_S2 : SUST_DEFAULT_S3;
+  if (defaultSet.has(v) || lista.includes(v)) return;
+  data[slot] = [v, ...lista]; // Más reciente primero
+  saveCustomSuplementos(data);
+  renderCustomSuplementos();
+  agregarAlDatalist(slot, v);
+}
+
+function eliminarSuplemento(slot, valor) {
+  const data = loadCustomSuplementos();
+  data[slot] = (data[slot] || []).filter(x => x !== valor);
+  saveCustomSuplementos(data);
+  renderCustomSuplementos();
+  // Quitar del datalist
+  const listId = slot === "s2" ? "calc-sust2-list" : "calc-sust3-list";
+  const dl = document.getElementById(listId);
+  if (dl) {
+    const opt = [...dl.options].find(o => o.value === valor);
+    if (opt) opt.remove();
+  }
+}
+
+function agregarAlDatalist(slot, valor) {
+  const listId = slot === "s2" ? "calc-sust2-list" : "calc-sust3-list";
+  const dl = document.getElementById(listId);
+  if (!dl) return;
+  // No duplicar
+  if ([...dl.options].some(o => o.value === valor)) return;
+  const opt = document.createElement("option");
+  opt.value = valor;
+  dl.prepend(opt); // Al inicio para que aparezca primero
+}
+
+function renderCustomSuplementos() {
+  const data = loadCustomSuplementos();
+
+  ["s2", "s3"].forEach(slot => {
+    const containerId = slot === "s2" ? "sust2CustomList" : "sust3CustomList";
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const lista = data[slot] || [];
+
+    if (lista.length === 0) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="custom-sust-header">📦 Mis suplementos guardados</div>
+      <div class="custom-sust-inner">
+        ${lista.map(v => `
+          <div class="custom-sust-chip">
+            <button type="button" class="chip-select" data-slot="${slot}" data-val="${v.replace(/"/g,'&quot;')}">${v}</button>
+            <button type="button" class="chip-del" data-slot="${slot}" data-val="${v.replace(/"/g,'&quot;')}" title="Eliminar de mi lista">✕</button>
+          </div>
+        `).join("")}
+      </div>`;
+
+    // Clic en chip → selecciona el suplemento
+    container.querySelectorAll(".chip-select").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const inputId = btn.dataset.slot === "s2" ? "sust2Tipo" : "sust3Tipo";
+        const input = document.getElementById(inputId);
+        if (input) { input.value = btn.dataset.val; calcularPasteurizacionUnificada(); }
+      });
+    });
+
+    // Clic en ✕ → eliminar del localStorage
+    container.querySelectorAll(".chip-del").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (confirm(`¿Eliminar "${btn.dataset.val}" de tu lista?`)) {
+          eliminarSuplemento(btn.dataset.slot, btn.dataset.val);
+        }
+      });
+    });
+  });
+}
+
+function initCustomSuplementos() {
+  const data = loadCustomSuplementos();
+  // Inyectar guardados en los datalists al inicio
+  ["s2", "s3"].forEach(slot => {
+    (data[slot] || []).forEach(v => agregarAlDatalist(slot, v));
+  });
+  renderCustomSuplementos();
+
+  // Botón Guardar Suplemento 1
+  document.getElementById("btnGuardarSust2")?.addEventListener("click", () => {
+    const val = document.getElementById("sust2Tipo")?.value.trim();
+    if (!val) return;
+    agregarSuplemento("s2", val);
+    // Feedback
+    const btn = document.getElementById("btnGuardarSust2");
+    const orig = btn.textContent;
+    btn.textContent = "✔ Guardado";
+    btn.style.borderColor = "var(--accent)";
+    btn.style.color = "var(--accent)";
+    setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ""; btn.style.color = ""; }, 1500);
+  });
+
+  // Botón Guardar Suplemento 2
+  document.getElementById("btnGuardarSust3")?.addEventListener("click", () => {
+    const val = document.getElementById("sust3Tipo")?.value.trim();
+    if (!val) return;
+    agregarSuplemento("s3", val);
+    const btn = document.getElementById("btnGuardarSust3");
+    const orig = btn.textContent;
+    btn.textContent = "✔ Guardado";
+    btn.style.borderColor = "var(--accent)";
+    btn.style.color = "var(--accent)";
+    setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ""; btn.style.color = ""; }, 1500);
+  });
+}
+
 // ── Datos por método ──
 const METODO_INFO = {
   agua_caliente: {
@@ -1915,6 +2061,9 @@ document.addEventListener("DOMContentLoaded", () => {
   syncEstadoBotones();
 
   // ── CALCULADORA UNIFICADA ──
+
+  // Inicializar suplementos personalizados
+  initCustomSuplementos();
 
   // Inicializar hint, sugeridos, volumen, params y calcular
   actualizarMetodoHint();

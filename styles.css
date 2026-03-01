@@ -1455,3 +1455,98 @@ footer {
   .calc-layout { grid-template-columns: 1fr; }
   .calc-right  { position: static; }
 }
+
+/* ========================= */
+/* SUPLEMENTOS PERSONALIZADOS*/
+/* ========================= */
+.sust-input-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sust-input-wrap input[type="text"] {
+  flex: 1;
+  margin: 0;
+}
+
+.btn-guardar-sust {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.btn-guardar-sust:hover {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+
+/* Chips de suplementos guardados */
+.custom-sust-chips {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.custom-sust-header {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+}
+
+.custom-sust-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.custom-sust-chip {
+  display: flex;
+  align-items: center;
+  background: rgba(34,211,238,0.07);
+  border: 1px solid rgba(34,211,238,0.22);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.custom-sust-chip:hover {
+  border-color: rgba(34,211,238,0.5);
+}
+
+.chip-select {
+  background: none;
+  border: none;
+  color: var(--accent2);
+  font-size: 0.72rem;
+  padding: 3px 8px 3px 10px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: color 0.15s;
+}
+.chip-select:hover { color: var(--text); }
+
+.chip-del {
+  background: none;
+  border: none;
+  border-left: 1px solid rgba(34,211,238,0.2);
+  color: var(--muted);
+  font-size: 0.62rem;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+}
+.chip-del:hover {
+  color: var(--danger);
+  background: rgba(239,68,68,0.08);
+}
