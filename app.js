@@ -841,9 +841,9 @@ function renderFlushChart(flushes, totalKg) {
   if (flushes.length === 0) return;
 
   const CALIDADCOL = {
-    "Premium": "#4ade80",
+    "Premium": "#a3cf36",
     "Estándar": "#22d3ee",
-    "Descarte parcial": "#f59e0b",
+    "Descarte parcial": "#a3cf36",
     "Descarte total": "#ef4444",
   };
   const PAD = { top: 16, right: 12, bottom: 36, left: 42 };
@@ -1221,7 +1221,7 @@ function agregarFlush() {
   if (btn) {
     const orig = btn.textContent;
     btn.textContent = "✔ Cosecha guardada";
-    btn.style.background = "#166534";
+    btn.style.background = "#3a5c0a";
     setTimeout(() => { btn.textContent = orig; btn.style.background = ""; }, 1400);
   }
 }
@@ -1831,7 +1831,7 @@ function guardarControlDiario() {
   if (btn) {
     const orig = btn.textContent;
     btn.textContent = "✔ Guardado";
-    btn.style.background = "#166534";
+    btn.style.background = "#3a5c0a";
     setTimeout(() => { btn.textContent = orig; btn.style.background = ""; }, 1500);
   }
 }
