@@ -2,13 +2,13 @@
 /* ROOT VARIABLES            */
 /* ========================= */
 :root {
-  --bg:           #0d1117;
-  --card:         #161b24;
-  --card2:        #1a2030;
-  --border:       #21283a;
-  --border-light: #2a3448;
-  --muted:        #5a6a80;
-  --muted2:       #8496ab;
+  --bg:           #1e2b42;
+  --card:         #243050;
+  --card2:        #2a3860;
+  --border:       #334470;
+  --border-light: #3d5080;
+  --muted:        #7a90b8;
+  --muted2:       #a0b4d0;
   --accent:       #a3cf36;
   --accent-dim:   rgba(163,207,54,0.12);
   --accent-glow:  rgba(163,207,54,0.08);
@@ -16,7 +16,7 @@
   --accent3:      #67e8f9;
   --text:         #dde8f0;
   --text-dim:     #a0b0c4;
-  --surface:      #0a0e16;
+  --surface:      #1a2540;
   --danger:       #ef4444;
   --danger-bg:    #3f0f0f;
 }
