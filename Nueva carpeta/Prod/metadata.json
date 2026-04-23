@@ -1,0 +1,7 @@
+{
+  "name": "Mushroom Production Log",
+  "description": "An application to register and monitor the different stages of mushroom production, starting with the detailed preparation phase.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

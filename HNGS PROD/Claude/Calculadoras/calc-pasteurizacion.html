@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora de Pasteurización · Hongos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg:           #1e2b42;
+  --card:         #243050;
+  --card2:        #2a3860;
+  --border:       #334470;
+  --border-light: #3d5080;
+  --muted:        #7a90b8;
+  --muted2:       #a0b4d0;
+  --accent:       #a3cf36;
+  --accent-dim:   rgba(163,207,54,0.12);
+  --accent2:      #22d3ee;
+  --text:         #dde8f0;
+  --text-dim:     #a0b0c4;
+  --surface:      #1a2540;
+  --danger:       #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.bg-glow {
+  position: fixed; top: -180px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 360px;
+  background: radial-gradient(ellipse, rgba(163,207,54,0.05) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--surface); color: var(--text);
+  padding: 24px 28px 48px; position: relative; z-index: 1;
+  min-height: 100vh; font-size: 14px; line-height: 1.6;
+}
+header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.header-inner { display: flex; align-items: center; gap: 14px; }
+.logo-mark { font-size: 1.7rem; line-height: 1; }
+h1 { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); }
+.subtitle { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+.header-badge {
+  margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.65rem;
+  color: var(--accent); border: 1px solid rgba(163,207,54,0.3);
+  padding: 3px 10px; border-radius: 20px; background: rgba(163,207,54,0.06);
+  text-decoration: none; cursor: pointer;
+}
+.header-badge:hover { background: rgba(163,207,54,0.12); }
+.calc-layout { display: grid; grid-template-columns: 1fr 360px; gap: 14px; align-items: start; }
+.calc-left { display: flex; flex-direction: column; gap: 14px; }
+.calc-right { display: flex; flex-direction: column; }
+.form-section {
+  background: var(--card); padding: 20px; border-radius: 12px;
+  border: 1px solid var(--border); animation: fadeIn 0.22s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.section-header::before {
+  content: ''; display: block; width: 3px; height: 20px;
+  background: var(--accent); border-radius: 2px; flex-shrink: 0; opacity: 0.75;
+}
+.section-header h2 { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.section-tag { display: none; }
+.block-card { border-radius: 0; padding: 0; margin: 0 0 14px; background: transparent; border: none; }
+.block-label { font-size: 0.65rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; font-weight: 500; }
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.row label { flex: 1; }
+.full { width: 100%; display: block; margin-bottom: 10px; }
+label { display: block; font-size: 0.76rem; font-weight: 500; color: var(--muted2); margin-bottom: 5px; }
+input, textarea, select {
+  width: 100%; padding: 9px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
+  transition: border-color 0.18s, box-shadow 0.18s; margin-top: 5px;
+}
+input:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(163,207,54,0.08);
+}
+input::placeholder { color: #2e3d52; }
+option { background: var(--card2); color: var(--text); }
+.field-hint { font-size: 0.68rem; color: var(--muted); display: block; margin-top: 4px; font-style: italic; }
+.calc-metodo-hint {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: rgba(163,207,54,0.05); border: 1px solid rgba(163,207,54,0.16);
+  border-radius: 8px; padding: 10px 14px; font-size: 0.78rem;
+  color: var(--muted2); line-height: 1.6; margin-top: 10px;
+}
+.hint-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.sugerido-tag {
+  font-size: 0.63rem; font-family: 'DM Sans', sans-serif;
+  color: var(--accent2); background: rgba(34,211,238,0.08);
+  border: 1px solid rgba(34,211,238,0.22); border-radius: 20px;
+  padding: 1px 8px; margin-left: 8px; vertical-align: middle;
+}
+.sust-input-wrap { display: flex; gap: 6px; align-items: center; }
+.sust-input-wrap input { flex: 1; margin: 0; }
+.btn-guardar-sust {
+  flex-shrink: 0; padding: 7px 10px; background: transparent;
+  border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
+  font-size: 0.7rem; font-family: 'DM Sans', sans-serif; cursor: pointer;
+  white-space: nowrap; transition: all 0.18s;
+}
+.btn-guardar-sust:hover { border-color: rgba(163,207,54,0.4); color: var(--accent); }
+.custom-sust-chips { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.custom-sust-header { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.custom-sust-inner { display: flex; flex-wrap: wrap; gap: 5px; }
+.custom-sust-chip {
+  display: flex; align-items: center;
+  background: rgba(163,207,54,0.06); border: 1px solid rgba(163,207,54,0.2);
+  border-radius: 20px; overflow: hidden; transition: border-color 0.18s;
+}
+.custom-sust-chip:hover { border-color: rgba(163,207,54,0.4); }
+.chip-select {
+  background: none; border: none; color: var(--accent); font-size: 0.72rem;
+  padding: 3px 8px 3px 10px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.chip-del {
+  background: none; border: none; border-left: 1px solid rgba(163,207,54,0.15);
+  color: var(--muted); font-size: 0.62rem; padding: 3px 7px; cursor: pointer;
+  transition: color 0.15s, background 0.15s; line-height: 1;
+}
+.chip-del:hover { color: var(--danger); background: rgba(239,68,68,0.08); }
+/* Resultados */
+.calc-resultado-panel { display: flex; flex-direction: column; gap: 10px; }
+.calc-res-metodo {
+  display: flex; flex-direction: column; gap: 4px; padding: 12px 14px;
+  background: rgba(163,207,54,0.06); border: 1px solid rgba(163,207,54,0.18);
+  border-radius: 10px;
+}
+.calc-metodo-badge { font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700; color: var(--accent); }
+.calc-metodo-params { font-size: 0.7rem; color: var(--muted); }
+.calc-res-seccion { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.calc-res-header {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);
+}
+.calc-res-title { font-size: 0.68rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; }
+.calc-res-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 7px 12px; border-bottom: 1px solid rgba(51,68,112,0.7); gap: 8px;
+}
+.calc-res-row:last-child { border-bottom: none; }
+.calc-res-label { font-size: 0.78rem; color: var(--muted2); flex: 1; }
+.calc-res-valor { font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: right; flex-shrink: 0; }
+.calc-res-sub { font-size: 0.63rem; font-weight: 400; color: var(--muted); margin-left: 4px; }
+.empty-msg { color: var(--muted); font-size: 0.82rem; padding: 20px 0; text-align: center; }
+footer {
+  margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border);
+  color: var(--muted); font-size: 0.76rem; text-align: center;
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+@media (max-width: 960px) {
+  .calc-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  body { padding: 12px 14px 32px; }
+  .row { flex-direction: column; }
+}
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">⚗️</div>
+    <div>
+      <h1>Calculadora de Pasteurización</h1>
+      <p class="subtitle">Hongos · Planificación de sustratos</p>
+    </div>
+    <a href="index.html" class="header-badge">← Inicio</a>
+  </div>
+</header>
+
+<main>
+  <div class="calc-layout">
+
+    <div class="calc-left">
+
+      <!-- MÉTODO -->
+      <section class="form-section">
+        <div class="section-header"><h2>Método de Pasteurización</h2></div>
+        <div class="block-card">
+          <label>Tipo de pasteurización
+            <select id="tipoPasteurizacion">
+              <option value="agua_caliente">Agua Caliente (70–80°C)</option>
+              <option value="alcalina">Alcalina / Encalado (pH 12)</option>
+              <option value="vapor">Vapor (90–100°C)</option>
+              <option value="vapor_presion">Vapor a Presión / Autoclave (121°C)</option>
+              <option value="hidratacion_fria">Hidratación en frío + Cal</option>
+            </select>
+          </label>
+          <div class="calc-metodo-hint" id="calcMetodoHint">
+            <span class="hint-icon">💡</span>
+            <span id="calcMetodoHintText"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECIPIENTES -->
+      <section class="form-section">
+        <div class="section-header"><h2>Recipientes</h2></div>
+        <div class="block-card">
+          <div class="row">
+            <label>Tipo de recipiente
+              <select id="tipoRecipiente">
+                <option value="bolsa_pp">Bolsa de PP (polipropileno)</option>
+                <option value="bolsa_pe">Bolsa de PE (polietileno)</option>
+                <option value="tarro_10">Tarro / Cubo 10 L</option>
+                <option value="tarro_20">Tarro / Cubo 20 L</option>
+                <option value="tarro_personalizado">Tarro personalizado</option>
+                <option value="bandeja">Bandeja</option>
+                <option value="cama">Cama / Estante</option>
+              </select>
+            </label>
+            <label>Volumen por recipiente (L)
+              <input type="number" id="volumenRecipiente" step="0.1" min="0" placeholder="10">
+            </label>
+          </div>
+          <div class="row">
+            <label>Densidad de la mezcla (kg/L)
+              <input type="number" id="densidadMezcla" step="0.01" min="0" value="0.65">
+              <span class="field-hint">Paja pasteurizada ≈ 0.55–0.70 · Aserrín ≈ 0.60–0.75</span>
+            </label>
+            <label>Porcentaje de llenado (%)
+              <input type="number" id="pctLlenado" step="1" min="0" max="100" value="85">
+              <span class="field-hint">Dejar espacio para el spawn</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUSTRATOS -->
+      <section class="form-section">
+        <div class="section-header"><h2>Composición del Sustrato</h2></div>
+        <div class="block-card">
+          <div class="block-label">SUSTRATO BASE</div>
+          <div class="row" style="margin-top:8px;">
+            <label>Tipo
+              <input type="text" id="sust1Tipo" list="calc-sustratos-list" placeholder="Paja de trigo" autocomplete="off">
+              <datalist id="calc-sustratos-list">
+                <option value="Paja de trigo">
+                <option value="Paja de arroz">
+                <option value="Paja de cebada">
+                <option value="Paja de centeno">
+                <option value="Aserrín de roble">
+                <option value="Aserrín de eucaliptus">
+                <option value="Aserrín de álamo">
+                <option value="Aserrín mixto de madera dura">
+                <option value="Mazorca de maíz triturada">
+                <option value="Cáscara de arroz">
+                <option value="Cáscara de girasol">
+                <option value="Pulpa de café">
+                <option value="Bagazo de caña">
+                <option value="Rastrojo de maíz">
+                <option value="Cartón corrugado molido">
+                <option value="Heno de gramíneas">
+              </datalist>
+            </label>
+            <label>Peso seco (kg)
+              <input type="number" id="sust1Kg" step="0.1" min="0" placeholder="100">
+            </label>
+          </div>
+
+          <div class="block-label" style="margin-top:14px;">SUPLEMENTO 1 <span class="sugerido-tag" id="sust2Sugerido"></span></div>
+          <div class="row" style="margin-top:8px;">
+            <label>Tipo
+              <div class="sust-input-wrap">
+                <input type="text" id="sust2Tipo" list="calc-sust2-list" placeholder="Ej: Salvado de trigo" autocomplete="off">
+                <button type="button" class="btn-guardar-sust" id="btnGuardarSust2">＋ Guardar</button>
+              </div>
+              <datalist id="calc-sust2-list">
+                <option value="Salvado de trigo">
+                <option value="Salvado de arroz">
+                <option value="Harina de soja">
+                <option value="Harina de maíz">
+                <option value="Avena en copos">
+                <option value="Semolín de trigo">
+                <option value="Melaza de caña">
+                <option value="Harina de alfalfa">
+                <option value="Levadura de cerveza">
+                <option value="Cáscara de soja">
+              </datalist>
+            </label>
+            <label>Porcentaje (% del sustrato base)
+              <input type="number" id="sust2Pct" step="0.1" min="0" max="100" placeholder="15">
+              <span class="field-hint" id="sust2KgCalc">— kg</span>
+            </label>
+          </div>
+          <div id="sust2CustomList" class="custom-sust-chips"></div>
+
+          <div class="block-label" style="margin-top:14px;">SUPLEMENTO 2 <span class="sugerido-tag" id="sust3Sugerido"></span></div>
+          <div class="row" style="margin-top:8px;">
+            <label>Tipo
+              <div class="sust-input-wrap">
+                <input type="text" id="sust3Tipo" list="calc-sust3-list" placeholder="Ej: Yeso agrícola" autocomplete="off">
+                <button type="button" class="btn-guardar-sust" id="btnGuardarSust3">＋ Guardar</button>
+              </div>
+              <datalist id="calc-sust3-list">
+                <option value="Yeso agrícola">
+                <option value="Carbonato de calcio">
+                <option value="Cal hidratada">
+                <option value="Ceniza de madera">
+                <option value="Zeolita">
+                <option value="Cáscara de arroz (enriquecedor)">
+                <option value="Avena en copos">
+                <option value="Salvado fino">
+              </datalist>
+            </label>
+            <label>Porcentaje (% del sustrato base)
+              <input type="number" id="sust3Pct" step="0.1" min="0" max="100" placeholder="5">
+              <span class="field-hint" id="sust3KgCalc">— kg</span>
+            </label>
+          </div>
+          <div id="sust3CustomList" class="custom-sust-chips"></div>
+        </div>
+      </section>
+
+      <!-- PARÁMETROS -->
+      <section class="form-section" id="seccionParametros">
+        <div class="section-header"><h2>Parámetros del Proceso</h2></div>
+        <div class="block-card" id="paramBlock"></div>
+      </section>
+
+    </div><!-- /calc-left -->
+
+    <!-- RESULTADOS -->
+    <div class="calc-right">
+      <section class="form-section" style="position:sticky;top:16px;">
+        <div class="section-header"><h2>Resultados</h2></div>
+        <button type="button" onclick="calcularPasteurizacionUnificada()" style="width:100%;margin-bottom:12px;padding:10px;background:var(--accent);color:#0c1a00;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;">⚡ Calcular</button>
+        <div class="calc-resultado-panel" id="calcResultadoPanel">
+          <p class="empty-msg">Completá los datos y presioná Calcular.</p>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  Calculadora de Pasteurización · Hongos
+  &nbsp;·&nbsp;
+  <a href="index.html">← Volver al inicio</a>
+</footer>
+
+<script>
+const CUSTOM_SUST_KEY = "hongosCustomSuplementos";
+const SUST_DEFAULT_S2 = new Set(["Salvado de trigo","Salvado de arroz","Harina de soja","Harina de maíz","Avena en copos","Semolín de trigo","Melaza de caña","Harina de alfalfa","Levadura de cerveza","Cáscara de soja"]);
+const SUST_DEFAULT_S3 = new Set(["Yeso agrícola","Carbonato de calcio","Cal hidratada","Ceniza de madera","Zeolita","Cáscara de arroz (enriquecedor)","Avena en copos","Salvado fino"]);
+
+function loadCustomSuplementos() {
+  try { const s = localStorage.getItem(CUSTOM_SUST_KEY); if (s) return JSON.parse(s); } catch {}
+  return { s2: [], s3: [] };
+}
+function saveCustomSuplementos(data) { localStorage.setItem(CUSTOM_SUST_KEY, JSON.stringify(data)); }
+
+function agregarSuplemento(slot, valor) {
+  const v = valor.trim(); if (!v) return;
+  const data = loadCustomSuplementos();
+  const lista = data[slot] || [];
+  const def = slot === "s2" ? SUST_DEFAULT_S2 : SUST_DEFAULT_S3;
+  if (def.has(v) || lista.includes(v)) return;
+  data[slot] = [v, ...lista];
+  saveCustomSuplementos(data);
+  renderCustomSuplementos();
+  agregarAlDatalist(slot, v);
+}
+
+function eliminarSuplemento(slot, valor) {
+  const data = loadCustomSuplementos();
+  data[slot] = (data[slot] || []).filter(x => x !== valor);
+  saveCustomSuplementos(data);
+  renderCustomSuplementos();
+  const dl = document.getElementById(slot === "s2" ? "calc-sust2-list" : "calc-sust3-list");
+  if (dl) { const opt = [...dl.options].find(o => o.value === valor); if (opt) opt.remove(); }
+}
+
+function agregarAlDatalist(slot, valor) {
+  const dl = document.getElementById(slot === "s2" ? "calc-sust2-list" : "calc-sust3-list");
+  if (!dl || [...dl.options].some(o => o.value === valor)) return;
+  const opt = document.createElement("option"); opt.value = valor; dl.prepend(opt);
+}
+
+function renderCustomSuplementos() {
+  const data = loadCustomSuplementos();
+  ["s2","s3"].forEach(slot => {
+    const container = document.getElementById(slot === "s2" ? "sust2CustomList" : "sust3CustomList");
+    if (!container) return;
+    const lista = data[slot] || [];
+    if (lista.length === 0) { container.innerHTML = ""; return; }
+    container.innerHTML = `
+      <div class="custom-sust-header">📦 Mis suplementos guardados</div>
+      <div class="custom-sust-inner">
+        ${lista.map(v => `<div class="custom-sust-chip">
+          <button type="button" class="chip-select" data-slot="${slot}" data-val="${v.replace(/"/g,'&quot;')}">${v}</button>
+          <button type="button" class="chip-del" data-slot="${slot}" data-val="${v.replace(/"/g,'&quot;')}" title="Eliminar">✕</button>
+        </div>`).join("")}
+      </div>`;
+    container.querySelectorAll(".chip-select").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const input = document.getElementById(btn.dataset.slot === "s2" ? "sust2Tipo" : "sust3Tipo");
+        if (input) { input.value = btn.dataset.val; calcularPasteurizacionUnificada(); }
+      });
+    });
+    container.querySelectorAll(".chip-del").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (confirm(`¿Eliminar "${btn.dataset.val}" de tu lista?`)) eliminarSuplemento(btn.dataset.slot, btn.dataset.val);
+      });
+    });
+  });
+}
+
+function initCustomSuplementos() {
+  const data = loadCustomSuplementos();
+  ["s2","s3"].forEach(slot => (data[slot] || []).forEach(v => agregarAlDatalist(slot, v)));
+  renderCustomSuplementos();
+  const btnFeedback = (id, slot) => {
+    document.getElementById(id)?.addEventListener("click", () => {
+      const input = document.getElementById(slot === "s2" ? "sust2Tipo" : "sust3Tipo");
+      const val = input?.value.trim(); if (!val) return;
+      agregarSuplemento(slot, val);
+      const btn = document.getElementById(id); if (!btn) return;
+      const orig = btn.textContent; btn.textContent = "✔ Guardado";
+      btn.style.borderColor = "var(--accent)"; btn.style.color = "var(--accent)";
+      setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ""; btn.style.color = ""; }, 1500);
+    });
+  };
+  btnFeedback("btnGuardarSust2", "s2");
+  btnFeedback("btnGuardarSust3", "s3");
+}
+
+const METODO_INFO = {
+  agua_caliente: {
+    label:"Agua Caliente (70–80°C)", hint:"Se sumerge el sustrato en agua a 70–80°C durante 1–2 horas. Simple y efectiva para paja. Humedad final ≈ 65–75%.",
+    aguaLitrosPorKg:8, tempC:"70–80°C", duracion:"60–120 min",
+    spawnPctMin:3, spawnPctMax:6, yesoSugerido:2, carbonatoSugerido:0, calSugerida:0, absorcionPct:65,
+    params:[
+      {id:"p_temp",   label:"Temperatura del agua (°C)",  default:75,  step:1,  hint:"Mantener entre 70–80°C"},
+      {id:"p_tiempo", label:"Tiempo de inmersión (min)",  default:90,  step:5,  hint:"60–120 min según densidad del sustrato"},
+    ],
+  },
+  alcalina: {
+    label:"Alcalina / Encalado (pH 12)", hint:"Se hidrata el sustrato en solución de cal (pH 12) a temperatura ambiente durante 12–18h. Sin calor, bajo costo, efectiva contra bacterias.",
+    aguaLitrosPorKg:7, tempC:"Ambiente", duracion:"12–18 h",
+    spawnPctMin:3, spawnPctMax:6, yesoSugerido:1, carbonatoSugerido:0, calSugerida:1.5, absorcionPct:68,
+    params:[
+      {id:"p_gCal",   label:"Gramos de cal por litro de agua", default:10, step:0.5, hint:"10–12 g/L para pH ≈ 12"},
+      {id:"p_horas",  label:"Tiempo de inmersión (horas)",     default:14, step:1,   hint:"12–18 horas"},
+    ],
+  },
+  vapor: {
+    label:"Vapor (90–100°C)", hint:"Vapor a presión atmosférica sobre el sustrato durante 2–4 horas. Mayor eficiencia que agua caliente, no requiere autoclave.",
+    aguaLitrosPorKg:1.5, tempC:"90–100°C", duracion:"2–4 h",
+    spawnPctMin:3, spawnPctMax:7, yesoSugerido:2, carbonatoSugerido:1, calSugerida:0, absorcionPct:62,
+    params:[
+      {id:"p_tiempo",    label:"Tiempo de vaporización (min)",     default:180, step:10, hint:"120–240 min según volumen"},
+      {id:"p_aguaVapor", label:"Agua para generar vapor (L)",      default:50,  step:5,  hint:"Aprox. 1 L agua → 1.7 m³ vapor a 100°C"},
+    ],
+  },
+  vapor_presion: {
+    label:"Vapor a Presión / Autoclave (121°C)", hint:"Esterilización completa a 121°C y 15 psi durante 2–3 horas. Usado para aserrín enriquecido. Elimina todo organismo incluyendo esporas.",
+    aguaLitrosPorKg:0.8, tempC:"121°C / 15 psi", duracion:"90–180 min",
+    spawnPctMin:2, spawnPctMax:5, yesoSugerido:1.5, carbonatoSugerido:0.5, calSugerida:0, absorcionPct:58,
+    params:[
+      {id:"p_tiempo", label:"Tiempo a presión (min)", default:150, step:10, hint:"90–180 min según volumen de la carga"},
+      {id:"p_psi",    label:"Presión (psi)",           default:15,  step:1,  hint:"15 psi = 121°C. No bajar de 12 psi."},
+    ],
+  },
+  hidratacion_fria: {
+    label:"Hidratación en frío + Cal", hint:"Sustrato seco hidratado en frío con cal por 24h. El pH alto (≥12) inhibe competidores. Más sencillo que el encalado caliente, menor eficiencia.",
+    aguaLitrosPorKg:7.5, tempC:"Ambiente (≤20°C)", duracion:"18–24 h",
+    spawnPctMin:4, spawnPctMax:8, yesoSugerido:1, carbonatoSugerido:0, calSugerida:1.8, absorcionPct:70,
+    params:[
+      {id:"p_gCal",   label:"Gramos de cal por litro", default:12, step:0.5, hint:"12–15 g/L para pH ≥ 12"},
+      {id:"p_horas",  label:"Tiempo de hidratación (horas)", default:20, step:1, hint:"18–24 horas mínimo"},
+    ],
+  },
+};
+
+const SUST_SUGERIDOS = {
+  "paja":    {s2:{tipo:"Salvado de trigo",  pct:15}, s3:{tipo:"Yeso agrícola",      pct:2}},
+  "arroz":   {s2:{tipo:"Salvado de arroz",  pct:10}, s3:{tipo:"Carbonato de calcio", pct:1}},
+  "aserrin": {s2:{tipo:"Salvado de trigo",  pct:20}, s3:{tipo:"Yeso agrícola",      pct:2}},
+  "aserrín": {s2:{tipo:"Salvado de trigo",  pct:20}, s3:{tipo:"Yeso agrícola",      pct:2}},
+  "mazorca": {s2:{tipo:"Harina de maíz",    pct:10}, s3:{tipo:"Yeso agrícola",      pct:2}},
+  "café":    {s2:{tipo:"Salvado de trigo",  pct:15}, s3:{tipo:"Carbonato de calcio", pct:1}},
+  "caña":    {s2:{tipo:"Melaza de caña",    pct:5},  s3:{tipo:"Yeso agrícola",      pct:2}},
+  "default": {s2:{tipo:"Salvado de trigo",  pct:15}, s3:{tipo:"Yeso agrícola",      pct:2}},
+};
+
+const VOLUMEN_RECIPIENTE = {bolsa_pp:2.5, bolsa_pe:3.0, tarro_10:10, tarro_20:20, tarro_personalizado:0, bandeja:20, cama:200};
+
+function getSugeridoSustrato(t) {
+  const l = (t||"").toLowerCase();
+  if (l.includes("arroz")) return SUST_SUGERIDOS["arroz"];
+  if (l.includes("aserrín")||l.includes("aserrin")) return SUST_SUGERIDOS["aserrin"];
+  if (l.includes("mazorca")||l.includes("maíz")) return SUST_SUGERIDOS["mazorca"];
+  if (l.includes("café")) return SUST_SUGERIDOS["café"];
+  if (l.includes("caña")) return SUST_SUGERIDOS["caña"];
+  if (l.includes("paja")) return SUST_SUGERIDOS["paja"];
+  return SUST_SUGERIDOS["default"];
+}
+
+function renderParamBlock() {
+  const metodo = document.getElementById("tipoPasteurizacion")?.value || "agua_caliente";
+  const info = METODO_INFO[metodo];
+  const block = document.getElementById("paramBlock");
+  if (!block) return;
+  block.innerHTML = info.params.map(p => `
+    <div class="row" style="margin-bottom:4px;">
+      <label class="full">${p.label}
+        <input type="number" id="${p.id}" value="${p.default}" step="${p.step}" min="0">
+        <span class="field-hint">${p.hint}</span>
+      </label>
+    </div>`).join("") + `
+    <div class="row" style="margin-top:8px;">
+      <label>% Spawn / Semilla de micelio
+        <input type="number" id="p_spawnPct" step="0.1" min="0" max="30" value="${((info.spawnPctMin+info.spawnPctMax)/2).toFixed(1)}">
+        <span class="field-hint">Sugerido: ${info.spawnPctMin}–${info.spawnPctMax}%</span>
+      </label>
+      <label>Yeso agrícola (% sobre sustrato base)
+        <input type="number" id="p_yesoPct" step="0.1" min="0" max="10" value="${info.yesoSugerido}">
+        <span class="field-hint">Sugerido: ${info.yesoSugerido}% · Mejora estructura</span>
+      </label>
+    </div>
+    <div class="row">
+      <label>Carbonato de calcio (% sobre sustrato base)
+        <input type="number" id="p_carbonatoPct" step="0.1" min="0" max="5" value="${info.carbonatoSugerido}">
+        <span class="field-hint">Sugerido: ${info.carbonatoSugerido}% · Buffer de pH</span>
+      </label>
+      ${info.calSugerida > 0 ? `<label>Cal hidratada (% sobre sustrato base)
+        <input type="number" id="p_calPct" step="0.1" min="0" max="10" value="${info.calSugerida}">
+        <span class="field-hint">Para pH ≥ 12</span>
+      </label>` : "<div></div>"}
+    </div>`;
+  block.querySelectorAll("input").forEach(i => i.addEventListener("input", calcularPasteurizacionUnificada));
+}
+
+function actualizarMetodoHint() {
+  const info = METODO_INFO[document.getElementById("tipoPasteurizacion")?.value || "agua_caliente"];
+  const el = document.getElementById("calcMetodoHintText");
+  if (el && info) el.textContent = info.hint;
+}
+
+function actualizarSugeridos() {
+  const sug = getSugeridoSustrato(document.getElementById("sust1Tipo")?.value || "");
+  const s2Tag = document.getElementById("sust2Sugerido");
+  const s3Tag = document.getElementById("sust3Sugerido");
+  if (s2Tag) s2Tag.textContent = `Sugerido: ${sug.s2.tipo} (${sug.s2.pct}%)`;
+  if (s3Tag) s3Tag.textContent = `Sugerido: ${sug.s3.tipo} (${sug.s3.pct}%)`;
+  const s2T = document.getElementById("sust2Tipo"), s2P = document.getElementById("sust2Pct");
+  const s3T = document.getElementById("sust3Tipo"), s3P = document.getElementById("sust3Pct");
+  if (s2T && !s2T.value) s2T.value = sug.s2.tipo;
+  if (s2P && !s2P.value) s2P.value = sug.s2.pct;
+  if (s3T && !s3T.value) s3T.value = sug.s3.tipo;
+  if (s3P && !s3P.value) s3P.value = sug.s3.pct;
+}
+
+function actualizarVolumenRecipiente() {
+  const tipo = document.getElementById("tipoRecipiente")?.value;
+  const volEl = document.getElementById("volumenRecipiente");
+  if (!volEl) return;
+  const vol = VOLUMEN_RECIPIENTE[tipo];
+  if (vol > 0) volEl.value = vol; else if (!volEl.value) volEl.placeholder = "Ingresá el volumen";
+}
+
+function calcularPasteurizacionUnificada() {
+  const metodo = document.getElementById("tipoPasteurizacion")?.value || "agua_caliente";
+  const info = METODO_INFO[metodo];
+  const sust1Kg  = Number(document.getElementById("sust1Kg")?.value)  || 0;
+  const sust2Pct = Number(document.getElementById("sust2Pct")?.value) || 0;
+  const sust3Pct = Number(document.getElementById("sust3Pct")?.value) || 0;
+  const sust1Tipo = document.getElementById("sust1Tipo")?.value || "Sustrato base";
+  const sust2Tipo = document.getElementById("sust2Tipo")?.value || "Suplemento 1";
+  const sust3Tipo = document.getElementById("sust3Tipo")?.value || "Suplemento 2";
+  const sust2Kg = sust1Kg * (sust2Pct / 100);
+  const sust3Kg = sust1Kg * (sust3Pct / 100);
+
+  const s2KgEl = document.getElementById("sust2KgCalc");
+  const s3KgEl = document.getElementById("sust3KgCalc");
+  if (s2KgEl) s2KgEl.textContent = sust2Kg > 0 ? `= ${sust2Kg.toFixed(2)} kg` : "— kg";
+  if (s3KgEl) s3KgEl.textContent = sust3Kg > 0 ? `= ${sust3Kg.toFixed(2)} kg` : "— kg";
+
+  if (sust1Kg <= 0) {
+    const panel = document.getElementById("calcResultadoPanel");
+    if (panel) panel.innerHTML = `<p class="empty-msg">Ingresá los kg del sustrato base para calcular.</p>`;
+    return;
+  }
+
+  const volRecipiente = Number(document.getElementById("volumenRecipiente")?.value) || 0;
+  const densidad      = Number(document.getElementById("densidadMezcla")?.value)    || 0.65;
+  const pctLlenado    = Number(document.getElementById("pctLlenado")?.value)         || 85;
+  const spawnPct      = Number(document.getElementById("p_spawnPct")?.value)         || ((info.spawnPctMin + info.spawnPctMax) / 2);
+  const yesoPct       = Number(document.getElementById("p_yesoPct")?.value)          || info.yesoSugerido;
+  const carbonatoPct  = Number(document.getElementById("p_carbonatoPct")?.value)     || info.carbonatoSugerido;
+  const calPct        = Number(document.getElementById("p_calPct")?.value)           || 0;
+
+  const sustratoSecoTotal = sust1Kg + sust2Kg + sust3Kg;
+
+  let aguaLitros = 0;
+  if (metodo === "agua_caliente" || metodo === "alcalina" || metodo === "hidratacion_fria") {
+    aguaLitros = sust1Kg * info.aguaLitrosPorKg;
+  } else {
+    const humObjetivo = info.absorcionPct / 100;
+    aguaLitros = (sustratoSecoTotal * humObjetivo) / (1 - humObjetivo);
+    aguaLitros += Number(document.getElementById("p_aguaVapor")?.value) || 50;
+  }
+
+  const yesoKg      = sust1Kg * (yesoPct / 100);
+  const carbonatoKg = sust1Kg * (carbonatoPct / 100);
+  const calKg       = sust1Kg * (calPct / 100);
+  let calPorAgua = 0;
+  if ((metodo === "alcalina" || metodo === "hidratacion_fria") && aguaLitros > 0) {
+    calPorAgua = (aguaLitros * (Number(document.getElementById("p_gCal")?.value) || 10)) / 1000;
+  }
+  const calFinalKg = calPorAgua > 0 ? calPorAgua : calKg;
+
+  const humObjetivo = info.absorcionPct / 100;
+  const pesoHumedoSustrato = sustratoSecoTotal / (1 - humObjetivo);
+  const pesoMezclaSinSpawn = pesoHumedoSustrato + yesoKg + carbonatoKg + calFinalKg;
+  const spawnKg = pesoMezclaSinSpawn * (spawnPct / 100);
+  const pesoMezclTotal = pesoMezclaSinSpawn + spawnKg;
+  const volumenTotalMezcla = densidad > 0 ? pesoMezclTotal / densidad : 0;
+  const volEfectivoRecipiente = volRecipiente * (pctLlenado / 100);
+  const cantidadRecipientes = (volRecipiente > 0 && volEfectivoRecipiente > 0)
+    ? Math.ceil(volumenTotalMezcla / volEfectivoRecipiente) : 0;
+  const prodMinKg = pesoMezclaSinSpawn * 0.10;
+  const prodMaxKg = pesoMezclaSinSpawn * 0.20;
+
+  const tipoRec = document.getElementById("tipoRecipiente")?.selectedOptions[0]?.text || "recipiente";
+  const panel = document.getElementById("calcResultadoPanel");
+  if (!panel) return;
+
+  const seccion = (title, tag, rows) => `
+    <div class="calc-res-seccion">
+      <div class="calc-res-header"><span class="calc-res-title">${title}</span></div>
+      ${rows.map(([label, val, sub]) => `
+        <div class="calc-res-row">
+          <span class="calc-res-label">${label}</span>
+          <span class="calc-res-valor">${val}${sub ? `<span class="calc-res-sub"> ${sub}</span>` : ""}</span>
+        </div>`).join("")}
+    </div>`;
+
+  panel.innerHTML = `
+    <div class="calc-res-metodo">
+      <span class="calc-metodo-badge">${info.label}</span>
+      <span class="calc-metodo-params">${info.tempC} · ${info.duracion}</span>
+    </div>
+    ${seccion("Sustratos (peso seco)", "SUSTRATOS", [
+      [sust1Tipo, `${sust1Kg.toFixed(2)} kg`, "base"],
+      sust2Kg > 0 ? [sust2Tipo, `${sust2Kg.toFixed(2)} kg`, `(${sust2Pct}%)`] : null,
+      sust3Kg > 0 ? [sust3Tipo, `${sust3Kg.toFixed(2)} kg`, `(${sust3Pct}%)`] : null,
+      ["Total sustrato seco", `${sustratoSecoTotal.toFixed(2)} kg`, ""],
+    ].filter(Boolean))}
+    ${seccion("Agua y aditivos", "AGUA", [
+      ["Agua necesaria", `${aguaLitros.toFixed(1)} L`, metodo==="agua_caliente"?"para inmersión":metodo==="vapor"?"total (absorción + generador)":"para hidratación"],
+      yesoKg > 0      ? ["Yeso agrícola",       `${yesoKg.toFixed(2)} kg`,      `(${yesoPct}%)`] : null,
+      carbonatoKg > 0 ? ["Carbonato de calcio", `${carbonatoKg.toFixed(2)} kg`, `(${carbonatoPct}%)`] : null,
+      calFinalKg > 0  ? ["Cal hidratada",        `${calFinalKg.toFixed(2)} kg`, metodo==="alcalina"||metodo==="hidratacion_fria"?"según g/L":`(${calPct}%)`] : null,
+    ].filter(Boolean))}
+    ${seccion("Spawn (semilla de micelio)", "SPAWN", [
+      ["Spawn necesario",   `${spawnKg.toFixed(2)} kg`, `(${spawnPct}% sobre mezcla húmeda)`],
+      ["Rango recomendado", `${(pesoMezclaSinSpawn*info.spawnPctMin/100).toFixed(2)}–${(pesoMezclaSinSpawn*info.spawnPctMax/100).toFixed(2)} kg`, `(${info.spawnPctMin}–${info.spawnPctMax}%)`],
+    ])}
+    ${seccion("Mezcla post-pasteurización", "MEZCLA HÚMEDA", [
+      ["Peso húmedo del sustrato", `${pesoHumedoSustrato.toFixed(2)} kg`, `(humedad ≈ ${info.absorcionPct}%)`],
+      ["Peso total con spawn",     `${pesoMezclTotal.toFixed(2)} kg`, ""],
+      ["Volumen estimado mezcla",  `${volumenTotalMezcla.toFixed(1)} L`, `(densidad ${densidad} kg/L)`],
+    ])}
+    ${volRecipiente > 0 ? seccion("Recipientes estimados", "RECIPIENTES", [
+      ["Volumen efectivo/recipiente", `${volEfectivoRecipiente.toFixed(1)} L`, `(${pctLlenado}% de ${volRecipiente} L)`],
+      ["Cantidad de recipientes",     `${cantidadRecipientes}`,              tipoRec],
+      cantidadRecipientes > 0 ? ["Peso aprox./recipiente", `${(pesoMezclTotal/cantidadRecipientes).toFixed(2)} kg`, ""] : null,
+    ].filter(Boolean)) : ""}
+    ${seccion("Producción estimada", "PRODUCCIÓN", [
+      ["Rendimiento biológico mín.", `${prodMinKg.toFixed(2)} kg`, "(10%)"],
+      ["Rendimiento biológico máx.", `${prodMaxKg.toFixed(2)} kg`, "(20%)"],
+    ])}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initCustomSuplementos();
+  actualizarMetodoHint();
+  actualizarVolumenRecipiente();
+  renderParamBlock();
+  actualizarSugeridos();
+  calcularPasteurizacionUnificada();
+
+  // Cambio de método
+  document.getElementById("tipoPasteurizacion")?.addEventListener("change", () => {
+    actualizarMetodoHint(); renderParamBlock(); calcularPasteurizacionUnificada();
+  });
+
+  // Cambio de recipiente
+  document.getElementById("tipoRecipiente")?.addEventListener("change", () => {
+    actualizarVolumenRecipiente(); calcularPasteurizacionUnificada();
+  });
+
+  // Sustrato base → sugeridos
+  document.getElementById("sust1Tipo")?.addEventListener("input", () => {
+    actualizarSugeridos(); calcularPasteurizacionUnificada();
+  });
+
+  // Event delegation en toda la columna izquierda:
+  // captura cualquier input/change incluyendo los params dinámicos
+  document.querySelector(".calc-left")?.addEventListener("input", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
+      calcularPasteurizacionUnificada();
+    }
+  });
+  document.querySelector(".calc-left")?.addEventListener("change", (e) => {
+    if (e.target.tagName === "SELECT") {
+      calcularPasteurizacionUnificada();
+    }
+  });
+});
+</script>
+</body>
+</html>

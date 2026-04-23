@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Eficiencia Biológica · Hongos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #1e2b42; --card: #243050; --card2: #2a3860;
+  --border: #334470; --muted: #7a90b8; --muted2: #a0b4d0;
+  --accent: #a3cf36; --accent2: #22d3ee;
+  --text: #dde8f0; --surface: #1a2540; --danger: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.bg-glow { position: fixed; top: -180px; left: 50%; transform: translateX(-50%); width: 700px; height: 360px; background: radial-gradient(ellipse, rgba(163,207,54,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--surface); color: var(--text); padding: 24px 28px 48px; position: relative; z-index: 1; min-height: 100vh; font-size: 14px; line-height: 1.6; }
+header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.header-inner { display: flex; align-items: center; gap: 14px; }
+.logo-mark { font-size: 1.7rem; line-height: 1; }
+h1 { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; }
+.subtitle { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+.header-badge { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--accent); border: 1px solid rgba(163,207,54,0.3); padding: 3px 10px; border-radius: 20px; background: rgba(163,207,54,0.06); text-decoration: none; }
+.header-badge:hover { background: rgba(163,207,54,0.12); }
+.form-section { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; animation: fadeIn 0.22s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.section-header::before { content: ''; display: block; width: 3px; height: 20px; background: var(--accent); border-radius: 2px; flex-shrink: 0; opacity: 0.75; }
+.section-header h2 { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+label { display: block; font-size: 0.76rem; font-weight: 500; color: var(--muted2); margin-bottom: 5px; }
+input, select { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.84rem; transition: border-color 0.18s, box-shadow 0.18s; margin-top: 5px; }
+input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(163,207,54,0.08); }
+input::placeholder { color: #2e3d52; }
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.row label { flex: 1; }
+.field-hint { font-size: 0.68rem; color: var(--muted); display: block; margin-top: 4px; font-style: italic; }
+/* Lote card */
+.lote-card { background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; transition: border-color 0.2s; }
+.lote-card:hover { border-color: rgba(163,207,54,0.3); }
+.lote-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.lote-num { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.08em; }
+.lote-nombre { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.lote-eb { font-family: 'Space Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+.lote-eb-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.lote-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin: 8px 0 4px; overflow: hidden; }
+.lote-bar { height: 100%; border-radius: 3px; transition: width 0.5s ease, background 0.3s; }
+.lote-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.lote-meta-item { font-size: 0.72rem; color: var(--muted2); }
+.lote-meta-item strong { color: var(--text); font-family: 'Space Mono', monospace; font-size: 0.7rem; }
+.btn-add { background: rgba(163,207,54,0.08); color: var(--accent); border: 1px solid rgba(163,207,54,0.25); border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.18s; }
+.btn-add:hover { background: rgba(163,207,54,0.15); }
+.btn-remove { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 4px 10px; font-size: 0.72rem; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.btn-remove:hover { background: rgba(239,68,68,0.16); }
+/* Resumen comparativo */
+.ranking-card { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.ranking-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.7rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; }
+.ranking-row { display: grid; grid-template-columns: 24px 1fr auto auto; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid rgba(51,68,112,0.6); }
+.ranking-row:last-child { border-bottom: none; }
+.rank-pos { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+.rank-pos.gold { color: #fbbf24; }
+.rank-pos.silver { color: var(--muted2); }
+.rank-nombre { font-size: 0.8rem; color: var(--text-dim); }
+.rank-eb { font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; }
+.rank-bar-mini-wrap { width: 80px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.rank-bar-mini { height: 100%; border-radius: 2px; }
+/* Stats resumen */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.stat-box { background: var(--card2); border: 1px solid rgba(163,207,54,0.12); border-radius: 10px; padding: 12px; text-align: center; }
+.stat-val { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+.stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+/* Canvas chart */
+.chart-wrap { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px 8px; margin-bottom: 14px; }
+canvas { display: block; width: 100%; }
+.empty-msg { color: var(--muted); font-size: 0.82rem; padding: 24px 0; text-align: center; }
+footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.76rem; text-align: center; }
+footer a { color: var(--accent); text-decoration: none; }
+@media (max-width: 600px) { body { padding: 12px 14px 32px; } .row { flex-direction: column; } .stats-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">📈</div>
+    <div>
+      <h1>Eficiencia Biológica</h1>
+      <p class="subtitle">Hongos · Comparación de lotes y rendimiento</p>
+    </div>
+    <a href="index.html" class="header-badge">← Inicio</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- CONFIGURACIÓN -->
+  <section class="form-section">
+    <div class="section-header"><h2>Configuración</h2></div>
+    <div class="row">
+      <label>Tipo de peso base para EB
+        <select id="tipoPesoBase" onchange="recalcularTodos()">
+          <option value="humedo">Peso húmedo post-pasteurización (más común)</option>
+          <option value="seco">Peso seco del sustrato</option>
+        </select>
+        <span class="field-hint">EB = kg cosechados ÷ kg de sustrato × 100%</span>
+      </label>
+      <label>Meta de EB (%)
+        <input type="number" id="metaEB" value="20" min="1" max="100" step="1" oninput="recalcularTodos()">
+        <span class="field-hint">Referencia para la barra de progreso. Pleurotus ≈ 15–25%</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- LOTES -->
+  <section class="form-section">
+    <div class="section-header"><h2>Lotes</h2></div>
+    <div id="lotesContainer"></div>
+    <button type="button" class="btn-add" onclick="agregarLote()">＋ Agregar lote</button>
+  </section>
+
+  <!-- COMPARATIVO -->
+  <div id="comparativoPanel"></div>
+
+</main>
+
+<footer>Eficiencia Biológica · Hongos &nbsp;·&nbsp; <a href="index.html">← Volver al inicio</a></footer>
+
+<script>
+let loteCount = 0;
+const COLORES = ["#a3cf36","#22d3ee","#f59e0b","#f472b6","#818cf8","#34d399","#fb923c","#a78bfa"];
+
+function agregarLote(preData = {}) {
+  const id = loteCount++;
+  const container = document.getElementById("lotesContainer");
+  const div = document.createElement("div");
+  div.className = "lote-card";
+  div.dataset.id = id;
+  const color = COLORES[id % COLORES.length];
+  div.style.borderLeft = `3px solid ${color}`;
+  div.innerHTML = `
+    <div class="lote-header">
+      <div>
+        <div class="lote-num">LOTE ${id + 1}</div>
+        <input type="text" class="lote-nombre-input" placeholder="Nombre del lote (ej: L-001 Paja trigo)" value="${preData.nombre || ""}"
+          style="margin-top:4px;padding:5px 8px;font-size:0.82rem;width:220px;" oninput="recalcularTodos()">
+      </div>
+      <div style="text-align:right;">
+        <div class="lote-eb" data-eb="—">—%</div>
+        <div class="lote-eb-label">EB</div>
+        <button type="button" class="btn-remove" onclick="eliminarLote(this)" style="margin-top:6px;">✕ Quitar</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Especie / hongo
+        <input type="text" class="lote-especie" placeholder="Pleurotus ostreatus" value="${preData.especie || ""}" list="especies-dl" oninput="recalcularTodos()">
+      </label>
+      <label>Sustrato base
+        <input type="text" class="lote-sustrato" placeholder="Paja de trigo" value="${preData.sustrato || ""}" oninput="recalcularTodos()">
+      </label>
+    </div>
+    <div class="row">
+      <label>Peso sustrato (kg)
+        <input type="number" class="lote-peso" min="0" step="0.1" placeholder="100" value="${preData.peso || ""}" oninput="recalcularTodos()">
+        <span class="field-hint">Según tipo de base seleccionado arriba</span>
+      </label>
+      <label>Total cosechado (kg)
+        <input type="number" class="lote-cosecha" min="0" step="0.01" placeholder="18" value="${preData.cosecha || ""}" oninput="recalcularTodos()">
+        <span class="field-hint">Suma de todos los flushes</span>
+      </label>
+    </div>
+    <!-- Flushes individuales -->
+    <div class="lote-flushes-label" style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Desglose por flush (opcional)</div>
+    <div class="lote-flushes" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <button type="button" onclick="agregarFlush(this)" style="margin-top:6px;background:transparent;border:1px dashed var(--border);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:0.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;">＋ Flush</button>
+    <!-- Barra EB -->
+    <div class="lote-bar-wrap" style="margin-top:12px;">
+      <div class="lote-bar" style="width:0%;background:${color};"></div>
+    </div>
+    <div class="lote-meta" style="margin-top:6px;"></div>`;
+  container.appendChild(div);
+  if (!document.getElementById("especies-dl")) {
+    const dl = document.createElement("datalist"); dl.id = "especies-dl";
+    ["Pleurotus ostreatus","Pleurotus djamor","Pleurotus eryngii","Lentinula edodes","Hericium erinaceus","Ganoderma lucidum"].forEach(s => {
+      const o = document.createElement("option"); o.value = s; dl.appendChild(o);
+    });
+    document.body.appendChild(dl);
+  }
+  recalcularTodos();
+}
+
+function agregarFlush(btn) {
+  const flushesDiv = btn.previousElementSibling;
+  const n = flushesDiv.children.length + 1;
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "display:flex;align-items:center;gap:4px;";
+  wrap.innerHTML = `<span style="font-size:0.65rem;color:var(--muted);font-family:'Space Mono',monospace;white-space:nowrap;">F${n}</span>
+    <input type="number" min="0" step="0.01" placeholder="kg" style="width:70px;padding:5px 8px;font-size:0.8rem;margin:0;" oninput="sincronizarCosecha(this)">
+    <button type="button" onclick="this.parentElement.remove();sincronizarCosecha(null,this.closest('.lote-card'))" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.75rem;padding:2px 4px;">✕</button>`;
+  flushesDiv.appendChild(wrap);
+}
+
+function sincronizarCosecha(input, card) {
+  const c = card || input.closest(".lote-card");
+  const total = Array.from(c.querySelectorAll(".lote-flushes input")).reduce((s, i) => s + (Number(i.value) || 0), 0);
+  if (total > 0) c.querySelector(".lote-cosecha").value = total.toFixed(2);
+  recalcularTodos();
+}
+
+function eliminarLote(btn) {
+  btn.closest(".lote-card").remove();
+  renumerarLotes();
+  recalcularTodos();
+}
+
+function renumerarLotes() {
+  document.querySelectorAll(".lote-card").forEach((c, i) => {
+    c.querySelector(".lote-num").textContent = `LOTE ${i + 1}`;
+  });
+}
+
+function calcularEB(peso, cosecha) {
+  if (!peso || !cosecha || peso <= 0) return null;
+  return (cosecha / peso) * 100;
+}
+
+function recalcularTodos() {
+  const meta = Number(document.getElementById("metaEB").value) || 20;
+  const lotes = [];
+
+  document.querySelectorAll(".lote-card").forEach((card, i) => {
+    const peso    = Number(card.querySelector(".lote-peso").value)    || 0;
+    const cosecha = Number(card.querySelector(".lote-cosecha").value) || 0;
+    const nombre  = card.querySelector(".lote-nombre-input").value.trim() || `Lote ${i + 1}`;
+    const especie = card.querySelector(".lote-especie").value.trim();
+    const sustrato= card.querySelector(".lote-sustrato").value.trim();
+    const eb      = calcularEB(peso, cosecha);
+    const color   = COLORES[i % COLORES.length];
+    const flushes = Array.from(card.querySelectorAll(".lote-flushes input")).map(inp => Number(inp.value) || 0).filter(v => v > 0);
+
+    // Actualizar card visual
+    const ebEl  = card.querySelector(".lote-eb");
+    const barEl = card.querySelector(".lote-bar");
+    const metaEl= card.querySelector(".lote-meta");
+    if (eb !== null) {
+      ebEl.textContent = eb.toFixed(1) + "%";
+      const barW = Math.min(100, (eb / (meta * 1.5)) * 100);
+      barEl.style.width = barW + "%";
+      barEl.style.background = eb >= meta ? "var(--accent)" : eb >= meta * 0.75 ? "#f59e0b" : "#f87171";
+      metaEl.innerHTML = `
+        <span class="lote-meta-item">Sustrato: <strong>${peso} kg</strong></span>
+        <span class="lote-meta-item">Cosecha: <strong>${cosecha} kg</strong></span>
+        ${flushes.length > 0 ? `<span class="lote-meta-item">Flushes: <strong>${flushes.length}</strong></span>` : ""}
+        ${flushes.length > 1 ? `<span class="lote-meta-item">Mejor flush: <strong>${Math.max(...flushes).toFixed(2)} kg</strong></span>` : ""}
+        <span class="lote-meta-item" style="color:${eb >= meta ? 'var(--accent)' : eb >= meta * 0.75 ? '#f59e0b' : '#f87171'};">
+          ${eb >= meta ? "✔ Meta alcanzada" : `Falta ${(meta - eb).toFixed(1)}% para meta`}
+        </span>`;
+    } else {
+      ebEl.textContent = "—%";
+      barEl.style.width = "0%";
+      metaEl.innerHTML = "";
+    }
+
+    if (peso > 0 && cosecha > 0) {
+      lotes.push({ id: i, nombre, especie, sustrato, peso, cosecha, eb, color, flushes });
+    }
+  });
+
+  renderComparativo(lotes, meta);
+}
+
+function renderComparativo(lotes, meta) {
+  const panel = document.getElementById("comparativoPanel");
+  if (lotes.length < 2) {
+    panel.innerHTML = lotes.length === 0
+      ? ""
+      : `<section class="form-section"><p class="empty-msg">Agregá al menos 2 lotes con datos para ver el comparativo.</p></section>`;
+    return;
+  }
+
+  const sorted = [...lotes].sort((a, b) => b.eb - a.eb);
+  const ebMax  = Math.max(...lotes.map(l => l.eb));
+  const ebMin  = Math.min(...lotes.map(l => l.eb));
+  const ebProm = lotes.reduce((s, l) => s + l.eb, 0) / lotes.length;
+  const totalCosecha = lotes.reduce((s, l) => s + l.cosecha, 0);
+  const totalSustrato = lotes.reduce((s, l) => s + l.peso, 0);
+
+  // Dibujar gráfico de barras
+  const canvasId = "ebChart";
+
+  panel.innerHTML = `
+    <section class="form-section">
+      <div class="section-header"><h2>Comparativo de lotes</h2></div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val">${ebProm.toFixed(1)}%</div>
+          <div class="stat-lbl">EB promedio</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--accent);">${ebMax.toFixed(1)}%</div>
+          <div class="stat-lbl">Mejor lote</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color:#f87171;">${ebMin.toFixed(1)}%</div>
+          <div class="stat-lbl">Menor lote</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="${canvasId}" height="180"></canvas>
+      </div>
+
+      <div class="ranking-card">
+        <div class="ranking-header">Ranking por eficiencia biológica</div>
+        ${sorted.map((l, i) => `
+          <div class="ranking-row">
+            <span class="rank-pos ${i===0?'gold':i===1?'silver':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</span>
+            <div>
+              <div class="rank-nombre">${l.nombre}</div>
+              ${l.especie ? `<div style="font-size:0.65rem;color:var(--muted);">${l.especie}${l.sustrato?' · '+l.sustrato:''}</div>` : ''}
+            </div>
+            <div class="rank-bar-mini-wrap">
+              <div class="rank-bar-mini" style="width:${(l.eb/ebMax)*100}%;background:${l.color};"></div>
+            </div>
+            <span class="rank-eb" style="color:${l.eb>=meta?'var(--accent)':l.eb>=meta*0.75?'#f59e0b':'#f87171'};">${l.eb.toFixed(1)}%</span>
+          </div>`).join("")}
+      </div>
+
+      <div style="margin-top:14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;">Resumen general</div>
+        <div style="display:flex;justify-content:space-between;padding:7px 12px;border-bottom:1px solid rgba(51,68,112,0.6);">
+          <span style="font-size:0.78rem;color:var(--muted2);">Total sustrato procesado</span>
+          <span style="font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--accent);">${totalSustrato.toFixed(1)} kg</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:7px 12px;border-bottom:1px solid rgba(51,68,112,0.6);">
+          <span style="font-size:0.78rem;color:var(--muted2);">Total cosechado</span>
+          <span style="font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--accent);">${totalCosecha.toFixed(2)} kg</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:7px 12px;">
+          <span style="font-size:0.78rem;color:var(--muted2);">EB global (todos los lotes)</span>
+          <span style="font-family:'Space Mono',monospace;font-size:0.9rem;font-weight:700;color:var(--accent);">${((totalCosecha/totalSustrato)*100).toFixed(1)}%</span>
+        </div>
+      </div>
+    </section>`;
+
+  // Dibujar canvas chart
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const W = canvas.offsetWidth || 500;
+    canvas.width = W; canvas.height = 180;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, W, canvas.height);
+    const PAD = { top:20, right:16, bottom:36, left:48 };
+    const chartW = W - PAD.left - PAD.right;
+    const chartH = canvas.height - PAD.top - PAD.bottom;
+    const maxEB = Math.max(ebMax, meta) * 1.15;
+    const barW = Math.min(50, (chartW / lotes.length) * 0.55);
+    const gap = chartW / lotes.length;
+
+    // Grid
+    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    [0.25, 0.5, 0.75, 1].forEach(r => {
+      const y = PAD.top + chartH * (1 - r);
+      ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + chartW, y); ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.font = "10px Space Mono, monospace"; ctx.textAlign = "right";
+      ctx.fillText((maxEB * r).toFixed(0) + "%", PAD.left - 4, y + 3);
+    });
+
+    // Línea de meta
+    const metaY = PAD.top + chartH * (1 - meta / maxEB);
+    ctx.strokeStyle = "rgba(163,207,54,0.4)"; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(PAD.left, metaY); ctx.lineTo(PAD.left + chartW, metaY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(163,207,54,0.7)"; ctx.font = "9px DM Sans, sans-serif"; ctx.textAlign = "left";
+    ctx.fillText("Meta " + meta + "%", PAD.left + chartW + 2, metaY + 3);
+
+    // Barras
+    lotes.forEach((l, i) => {
+      const x = PAD.left + gap * i + gap / 2;
+      const bh = (l.eb / maxEB) * chartH;
+      const y = PAD.top + chartH - bh;
+      ctx.fillStyle = l.color + "50";
+      ctx.strokeStyle = l.color; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(x - barW/2, y, barW, bh, [3,3,0,0]);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = l.color; ctx.font = "bold 10px Space Mono, monospace"; ctx.textAlign = "center";
+      ctx.fillText(l.eb.toFixed(1) + "%", x, y - 4);
+      ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.font = "10px DM Sans, sans-serif";
+      const short = l.nombre.length > 10 ? l.nombre.substring(0, 9) + "…" : l.nombre;
+      ctx.fillText(short, x, PAD.top + chartH + 14);
+    });
+  });
+}
+
+// Init con 3 lotes de ejemplo
+document.addEventListener("DOMContentLoaded", () => {
+  agregarLote({ nombre:"L-001 Paja trigo", especie:"Pleurotus ostreatus", sustrato:"Paja de trigo", peso:100, cosecha:18 });
+  agregarLote({ nombre:"L-002 Aserrín", especie:"Pleurotus ostreatus", sustrato:"Aserrín álamo", peso:80, cosecha:14 });
+  agregarLote({ nombre:"L-003 Mix paja/café", especie:"Pleurotus djamor", sustrato:"Paja + pulpa café", peso:60, cosecha:13.5 });
+});
+</script>
+</body>
+</html>

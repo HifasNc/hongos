@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Formulación de Sustrato · Hongos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #1e2b42; --card: #243050; --card2: #2a3860;
+  --border: #334470; --border-light: #3d5080;
+  --muted: #7a90b8; --muted2: #a0b4d0;
+  --accent: #a3cf36; --accent2: #22d3ee;
+  --text: #dde8f0; --text-dim: #a0b0c4;
+  --surface: #1a2540; --danger: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.bg-glow {
+  position: fixed; top: -180px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 360px;
+  background: radial-gradient(ellipse, rgba(163,207,54,0.05) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--surface); color: var(--text); padding: 24px 28px 48px; position: relative; z-index: 1; min-height: 100vh; font-size: 14px; line-height: 1.6; }
+header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.header-inner { display: flex; align-items: center; gap: 14px; }
+.logo-mark { font-size: 1.7rem; line-height: 1; }
+h1 { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; color: var(--text); }
+.subtitle { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+.header-badge { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--accent); border: 1px solid rgba(163,207,54,0.3); padding: 3px 10px; border-radius: 20px; background: rgba(163,207,54,0.06); text-decoration: none; }
+.header-badge:hover { background: rgba(163,207,54,0.12); }
+.layout { display: grid; grid-template-columns: 1fr 380px; gap: 14px; align-items: start; }
+.left { display: flex; flex-direction: column; gap: 14px; }
+.right { display: flex; flex-direction: column; gap: 14px; }
+.form-section { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); animation: fadeIn 0.22s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.section-header::before { content: ''; display: block; width: 3px; height: 20px; background: var(--accent); border-radius: 2px; flex-shrink: 0; opacity: 0.75; }
+.section-header h2 { font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.row label { flex: 1; }
+.full { width: 100%; display: block; margin-bottom: 10px; }
+label { display: block; font-size: 0.76rem; font-weight: 500; color: var(--muted2); margin-bottom: 5px; }
+input, select { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.84rem; transition: border-color 0.18s, box-shadow 0.18s; margin-top: 5px; }
+input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(163,207,54,0.08); }
+input::placeholder { color: #2e3d52; }
+option { background: var(--card2); color: var(--text); }
+.field-hint { font-size: 0.68rem; color: var(--muted); display: block; margin-top: 4px; font-style: italic; }
+button.btn-add { background: rgba(163,207,54,0.08); color: var(--accent); border: 1px solid rgba(163,207,54,0.25); border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.18s; }
+button.btn-add:hover { background: rgba(163,207,54,0.15); }
+button.btn-remove { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 4px 10px; font-size: 0.72rem; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+button.btn-remove:hover { background: rgba(239,68,68,0.16); }
+button.btn-calc { width: 100%; padding: 11px; background: var(--accent); color: #0c1a00; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.18s; margin-top: 4px; }
+button.btn-calc:hover { background: #bce254; box-shadow: 0 4px 16px rgba(163,207,54,0.22); }
+.component-block { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; position: relative; }
+.component-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.component-num { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--accent); letter-spacing: 0.08em; }
+/* Resultado */
+.res-panel { display: flex; flex-direction: column; gap: 10px; }
+.res-seccion { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.res-header { padding: 8px 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border); font-size: 0.68rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; }
+.res-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 12px; border-bottom: 1px solid rgba(51,68,112,0.6); gap: 8px; }
+.res-row:last-child { border-bottom: none; }
+.res-label { font-size: 0.78rem; color: var(--muted2); flex: 1; }
+.res-valor { font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: right; }
+.res-sub { font-size: 0.63rem; font-weight: 400; color: var(--muted); margin-left: 4px; }
+.res-warn { color: #fbbf24; }
+.res-ok { color: var(--accent); }
+.res-bad { color: var(--danger); }
+.cn-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; margin: 6px 0 2px; overflow: hidden; }
+.cn-bar { height: 100%; border-radius: 4px; transition: width 0.5s ease, background 0.3s; }
+.cn-label { font-size: 0.68rem; color: var(--muted); display: flex; justify-content: space-between; }
+.empty-msg { color: var(--muted); font-size: 0.82rem; padding: 24px 0; text-align: center; }
+/* Componente C:N chips */
+.cn-ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 8px; }
+.cn-ref-item { display: flex; justify-content: space-between; padding: 5px 8px; background: rgba(255,255,255,0.02); border-radius: 6px; font-size: 0.72rem; }
+.cn-ref-name { color: var(--muted2); }
+.cn-ref-val { font-family: 'Space Mono', monospace; color: var(--accent2); font-size: 0.68rem; }
+footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.76rem; text-align: center; }
+footer a { color: var(--accent); text-decoration: none; }
+@media (max-width: 960px) { .layout { grid-template-columns: 1fr; } .right { position: static; } }
+@media (max-width: 600px) { body { padding: 12px 14px 32px; } .row { flex-direction: column; } }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">🌾</div>
+    <div>
+      <h1>Formulación de Sustrato</h1>
+      <p class="subtitle">Hongos · Proporciones, humedad y relación C:N</p>
+    </div>
+    <a href="index.html" class="header-badge">← Inicio</a>
+  </div>
+</header>
+
+<main>
+  <div class="layout">
+    <div class="left">
+
+      <!-- ESPECIE -->
+      <section class="form-section">
+        <div class="section-header"><h2>Especie objetivo</h2></div>
+        <div class="row">
+          <label>Especie
+            <select id="especieSelect" onchange="cargarPerfilEspecie()">
+              <option value="">— Seleccioná —</option>
+              <option value="pleurotus_ostreatus">Pleurotus ostreatus (Ostra gris)</option>
+              <option value="pleurotus_djamor">Pleurotus djamor (Ostra rosa)</option>
+              <option value="pleurotus_eryngii">Pleurotus eryngii (Ostra rey)</option>
+              <option value="lentinula_edodes">Lentinula edodes (Shiitake)</option>
+              <option value="hericium_erinaceus">Hericium erinaceus (Melena de león)</option>
+              <option value="ganoderma">Ganoderma lucidum (Reishi)</option>
+              <option value="custom">Personalizada</option>
+            </select>
+          </label>
+          <label>Peso total del lote (kg secos)
+            <input type="number" id="pesoTotal" min="0.1" step="0.1" placeholder="100" oninput="calcular()">
+          </label>
+        </div>
+        <div id="especieHint" style="display:none;" class="field-hint" style="margin-top:6px;"></div>
+        <!-- Rangos editables para especie custom -->
+        <div id="customRangos" style="display:none;">
+          <div class="row" style="margin-top:8px;">
+            <label>C:N óptimo (mínimo)
+              <input type="number" id="cnMin" value="25" step="1" min="1" oninput="calcular()">
+            </label>
+            <label>C:N óptimo (máximo)
+              <input type="number" id="cnMax" value="45" step="1" min="1" oninput="calcular()">
+            </label>
+          </div>
+          <div class="row">
+            <label>Humedad objetivo (%)
+              <input type="number" id="humedadObj" value="65" step="1" min="40" max="85" oninput="calcular()">
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMPONENTES -->
+      <section class="form-section">
+        <div class="section-header"><h2>Componentes de la mezcla</h2></div>
+        <div id="componentesContainer"></div>
+        <button type="button" class="btn-add" onclick="agregarComponente()">＋ Agregar componente</button>
+      </section>
+
+      <!-- HUMEDAD -->
+      <section class="form-section">
+        <div class="section-header"><h2>Hidratación</h2></div>
+        <div class="row">
+          <label>Humedad promedio del material seco (%)
+            <input type="number" id="humedadMaterial" value="12" step="1" min="0" max="50" oninput="calcular()">
+            <span class="field-hint">Paja/aserrín almacenado ≈ 10–15%. Fresco ≈ 20–30%.</span>
+          </label>
+          <label>Humedad objetivo post-pasteurización (%)
+            <input type="number" id="humedadFinal" value="65" step="1" min="50" max="85" oninput="calcular()">
+            <span class="field-hint">Pleurotus: 60–70% · Shiitake: 55–65%</span>
+          </label>
+        </div>
+      </section>
+
+      <button type="button" class="btn-calc" onclick="calcular()">⚡ Calcular formulación</button>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="right">
+      <section class="form-section" style="position:sticky;top:16px;">
+        <div class="section-header"><h2>Resultados</h2></div>
+        <div id="resultadoPanel" class="res-panel">
+          <p class="empty-msg">Completá los datos para ver la formulación.</p>
+        </div>
+      </section>
+
+      <!-- Referencia C:N -->
+      <section class="form-section">
+        <div class="section-header"><h2>Referencia C:N</h2></div>
+        <div class="cn-ref-grid">
+          <div class="cn-ref-item"><span class="cn-ref-name">Paja de trigo</span><span class="cn-ref-val">80–100</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Paja de arroz</span><span class="cn-ref-val">40–60</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Aserrín roble</span><span class="cn-ref-val">300–500</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Aserrín álamo</span><span class="cn-ref-val">150–250</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Mazorca maíz</span><span class="cn-ref-val">50–80</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Pulpa de café</span><span class="cn-ref-val">20–30</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Salvado de trigo</span><span class="cn-ref-val">15–20</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Harina de soja</span><span class="cn-ref-val">5–10</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Bagazo de caña</span><span class="cn-ref-val">70–100</span></div>
+          <div class="cn-ref-item"><span class="cn-ref-name">Cáscara de girasol</span><span class="cn-ref-val">60–80</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>Formulación de Sustrato · Hongos &nbsp;·&nbsp; <a href="index.html">← Volver al inicio</a></footer>
+
+<script>
+// ── DATOS DE ESPECIES ──
+const ESPECIES = {
+  pleurotus_ostreatus: { label:"Pleurotus ostreatus", cnMin:25, cnMax:45, humedad:65, hint:"Muy versátil. Prefiere paja de trigo/arroz. C:N ideal 25–45, humedad 60–70%." },
+  pleurotus_djamor:    { label:"Pleurotus djamor",    cnMin:25, cnMax:45, humedad:68, hint:"Similar a P. ostreatus. Tolera sustratos más húmedos (65–72%). Temperatura cálida." },
+  pleurotus_eryngii:   { label:"Pleurotus eryngii",   cnMin:30, cnMax:50, humedad:62, hint:"Prefiere aserrín de roble con suplementos. C:N 30–50, humedad 58–65%." },
+  lentinula_edodes:    { label:"Lentinula edodes",    cnMin:50, cnMax:100, humedad:60, hint:"Requiere madera dura. C:N elevado 50–100. Humedad 55–65%. Colonización lenta." },
+  hericium_erinaceus:  { label:"Hericium erinaceus",  cnMin:80, cnMax:150, humedad:60, hint:"Aserrín de roble/haya. C:N alto 80–150. Sensible a contaminantes." },
+  ganoderma:           { label:"Ganoderma lucidum",   cnMin:100, cnMax:300, humedad:58, hint:"Madera dura. C:N muy alto 100–300. Esterilización recomendada." },
+  custom:              { label:"Personalizada",        cnMin:25, cnMax:45, humedad:65, hint:"Configurá los rangos según tu especie." },
+};
+
+// ── DATOS C:N DE MATERIALES ──
+const CN_MATERIALES = {
+  "Paja de trigo":            { cn: 90,  c: 46, n: 0.51 },
+  "Paja de arroz":            { cn: 50,  c: 42, n: 0.84 },
+  "Paja de cebada":           { cn: 80,  c: 45, n: 0.56 },
+  "Paja de centeno":          { cn: 85,  c: 46, n: 0.54 },
+  "Aserrín de roble":         { cn: 400, c: 50, n: 0.13 },
+  "Aserrín de haya":          { cn: 350, c: 49, n: 0.14 },
+  "Aserrín de álamo":         { cn: 200, c: 48, n: 0.24 },
+  "Aserrín de eucaliptus":    { cn: 300, c: 49, n: 0.16 },
+  "Aserrín mixto":            { cn: 300, c: 49, n: 0.16 },
+  "Mazorca de maíz":          { cn: 65,  c: 46, n: 0.71 },
+  "Rastrojo de maíz":         { cn: 55,  c: 44, n: 0.80 },
+  "Bagazo de caña":           { cn: 85,  c: 45, n: 0.53 },
+  "Cáscara de girasol":       { cn: 70,  c: 46, n: 0.66 },
+  "Pulpa de café":             { cn: 25,  c: 45, n: 1.80 },
+  "Cáscara de arroz":         { cn: 60,  c: 38, n: 0.63 },
+  "Cartón corrugado":         { cn: 200, c: 45, n: 0.23 },
+  "Salvado de trigo":         { cn: 17,  c: 46, n: 2.70 },
+  "Salvado de arroz":         { cn: 20,  c: 42, n: 2.10 },
+  "Harina de soja":           { cn: 7,   c: 44, n: 6.30 },
+  "Harina de maíz":           { cn: 10,  c: 45, n: 4.50 },
+  "Avena en copos":           { cn: 16,  c: 46, n: 2.88 },
+  "Harina de alfalfa":        { cn: 12,  c: 44, n: 3.67 },
+  "Levadura de cerveza":      { cn: 5,   c: 44, n: 8.80 },
+  "Melaza de caña":           { cn: 15,  c: 42, n: 2.80 },
+  "Yeso agrícola":            { cn: null, c: 0, n: 0 },
+  "Carbonato de calcio":      { cn: null, c: 0, n: 0 },
+};
+
+const MATERIALES_LIST = Object.keys(CN_MATERIALES);
+let componenteCount = 0;
+
+function cargarPerfilEspecie() {
+  const val = document.getElementById("especieSelect").value;
+  const esp = ESPECIES[val];
+  const hintEl = document.getElementById("especieHint");
+  const customEl = document.getElementById("customRangos");
+  if (!esp) { hintEl.style.display = "none"; customEl.style.display = "none"; return; }
+  hintEl.textContent = "💡 " + esp.hint;
+  hintEl.style.display = "block";
+  document.getElementById("humedadFinal").value = esp.humedad;
+  customEl.style.display = val === "custom" ? "block" : "none";
+  calcular();
+}
+
+function agregarComponente() {
+  const c = componenteCount++;
+  const container = document.getElementById("componentesContainer");
+  const div = document.createElement("div");
+  div.className = "component-block";
+  div.dataset.id = c;
+  div.innerHTML = `
+    <div class="component-header">
+      <span class="component-num">COMPONENTE ${container.children.length + 1}</span>
+      <button type="button" class="btn-remove" onclick="eliminarComponente(this)">✕ Quitar</button>
+    </div>
+    <div class="row">
+      <label>Material
+        <input type="text" class="comp-material" list="materiales-list" placeholder="Paja de trigo" autocomplete="off" oninput="calcular()">
+      </label>
+      <label>Proporción (%)
+        <input type="number" class="comp-pct" min="0" max="100" step="1" placeholder="60" oninput="calcular()">
+      </label>
+    </div>
+    <label style="display:block;margin-top:4px;">C:N del material
+      <input type="number" class="comp-cn" min="1" step="1" placeholder="Auto" oninput="calcular()">
+      <span class="field-hint comp-cn-hint">Seleccioná un material para autocompletar</span>
+    </label>`;
+  container.appendChild(div);
+  renumerarComponentes();
+
+  // Datalist
+  if (!document.getElementById("materiales-list")) {
+    const dl = document.createElement("datalist");
+    dl.id = "materiales-list";
+    MATERIALES_LIST.forEach(m => { const o = document.createElement("option"); o.value = m; dl.appendChild(o); });
+    document.body.appendChild(dl);
+  }
+
+  // Auto-fill C:N al seleccionar material
+  div.querySelector(".comp-material").addEventListener("change", function() {
+    const data = CN_MATERIALES[this.value.trim()];
+    const cnInput = div.querySelector(".comp-cn");
+    const cnHint  = div.querySelector(".comp-cn-hint");
+    if (data && data.cn) {
+      cnInput.value = data.cn;
+      cnHint.textContent = `C:N conocido para este material: ${data.cn}`;
+    } else if (data && !data.cn) {
+      cnInput.value = "";
+      cnHint.textContent = "Material sin carbono/nitrógeno significativo (aditivo mineral)";
+    } else {
+      cnHint.textContent = "Material no reconocido — ingresá el C:N manualmente";
+    }
+    calcular();
+  });
+
+  calcular();
+}
+
+function eliminarComponente(btn) {
+  btn.closest(".component-block").remove();
+  renumerarComponentes();
+  calcular();
+}
+
+function renumerarComponentes() {
+  document.querySelectorAll(".component-block").forEach((el, i) => {
+    el.querySelector(".component-num").textContent = `COMPONENTE ${i + 1}`;
+  });
+}
+
+function getEspecieRangos() {
+  const val = document.getElementById("especieSelect").value;
+  if (val === "custom") {
+    return {
+      cnMin: Number(document.getElementById("cnMin").value) || 25,
+      cnMax: Number(document.getElementById("cnMax").value) || 45,
+      humedad: Number(document.getElementById("humedadObj").value) || 65,
+    };
+  }
+  return ESPECIES[val] || { cnMin:25, cnMax:45, humedad:65 };
+}
+
+function calcular() {
+  const pesoTotal = Number(document.getElementById("pesoTotal").value) || 0;
+  const humedadMaterial = Number(document.getElementById("humedadMaterial").value) || 12;
+  const humedadFinal    = Number(document.getElementById("humedadFinal").value)    || 65;
+  const rangos = getEspecieRangos();
+
+  // Leer componentes
+  const comps = [];
+  document.querySelectorAll(".component-block").forEach(el => {
+    const mat  = el.querySelector(".comp-material").value.trim();
+    const pct  = Number(el.querySelector(".comp-pct").value) || 0;
+    const cn   = Number(el.querySelector(".comp-cn").value)  || null;
+    if (pct > 0) comps.push({ mat, pct, cn });
+  });
+
+  const panel = document.getElementById("resultadoPanel");
+  if (comps.length === 0 || pesoTotal <= 0) {
+    panel.innerHTML = `<p class="empty-msg">Agregá componentes e ingresá el peso total.</p>`;
+    return;
+  }
+
+  // Normalizar proporciones
+  const totalPct = comps.reduce((s, c) => s + c.pct, 0);
+  const compNorm = comps.map(c => ({ ...c, pctNorm: (c.pct / totalPct) * 100 }));
+
+  // Calcular C:N de la mezcla (promedio ponderado)
+  let cnMezcla = null;
+  const compsConCN = compNorm.filter(c => c.cn && c.cn > 0);
+  if (compsConCN.length > 0) {
+    const totalPctCN = compsConCN.reduce((s, c) => s + c.pctNorm, 0);
+    cnMezcla = compsConCN.reduce((sum, c) => sum + (c.cn * c.pctNorm / totalPctCN), 0);
+  }
+
+  // Pesos secos por componente
+  const compKg = compNorm.map(c => ({ ...c, kgSeco: pesoTotal * (c.pctNorm / 100) }));
+
+  // Agua necesaria para humedad objetivo
+  // Formula: Agua (L) = (pesoSeco * humObjPct - pesoSeco * humMat%) / (1 - humObjPct)
+  const humMatFrac = humedadMaterial / 100;
+  const humFinalFrac = humedadFinal / 100;
+  const aguaLitros = pesoTotal > 0
+    ? Math.max(0, (pesoTotal * humFinalFrac - pesoTotal * humMatFrac) / (1 - humFinalFrac))
+    : 0;
+  const pesoHumedo = pesoTotal + aguaLitros;
+
+  // Evaluación C:N
+  let cnStatus = "sin-datos";
+  let cnColor  = "var(--muted)";
+  let cnMsg    = "Sin datos C:N suficientes";
+  let cnBarPct = 0;
+  if (cnMezcla !== null) {
+    if (cnMezcla < rangos.cnMin) { cnStatus = "bajo"; cnColor = "#fbbf24"; cnMsg = `Muy bajo (< ${rangos.cnMin}) — el N excede al C. Riesgo de contaminación.`; }
+    else if (cnMezcla > rangos.cnMax) { cnStatus = "alto"; cnColor = "#f87171"; cnMsg = `Muy alto (> ${rangos.cnMax}) — poco N disponible. Colonización lenta.`; }
+    else { cnStatus = "ok"; cnColor = "var(--accent)"; cnMsg = `Óptimo para la especie seleccionada (${rangos.cnMin}–${rangos.cnMax})`; }
+    // Barra: mapear cnMezcla a 0–100% donde el centro es el óptimo
+    const cnIdeal = (rangos.cnMin + rangos.cnMax) / 2;
+    cnBarPct = Math.min(100, Math.max(5, (cnMezcla / (cnIdeal * 3)) * 100));
+  }
+
+  const pctWarn = totalPct !== 100
+    ? `<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:8px;padding:8px 12px;font-size:0.78rem;color:#fbbf24;margin-bottom:8px;">⚠️ Las proporciones suman ${totalPct.toFixed(0)}% — se normalizan a 100% para el cálculo.</div>`
+    : "";
+
+  panel.innerHTML = pctWarn + `
+    <div class="res-seccion">
+      <div class="res-header">Composición del lote (${pesoTotal} kg secos)</div>
+      ${compKg.map(c => `
+        <div class="res-row">
+          <span class="res-label">${c.mat || "Sin nombre"}</span>
+          <span class="res-valor">${c.kgSeco.toFixed(2)} kg <span class="res-sub">(${c.pctNorm.toFixed(1)}%)</span></span>
+        </div>`).join("")}
+    </div>
+
+    <div class="res-seccion">
+      <div class="res-header">Relación C:N de la mezcla</div>
+      <div style="padding:10px 12px;">
+        ${cnMezcla !== null ? `
+          <div style="font-family:'Space Mono',monospace;font-size:1.6rem;font-weight:700;color:${cnColor};line-height:1;">${cnMezcla.toFixed(0)}:1</div>
+          <div class="cn-bar-wrap"><div class="cn-bar" style="width:${cnBarPct}%;background:${cnColor};"></div></div>
+          <div class="cn-label"><span>Bajo</span><span>Óptimo ${rangos.cnMin}–${rangos.cnMax}</span><span>Alto</span></div>
+          <div style="font-size:0.75rem;color:${cnColor};margin-top:6px;">${cnMsg}</div>
+        ` : `<div style="color:var(--muted);font-size:0.8rem;">Ingresá los valores C:N de los materiales para calcular.</div>`}
+      </div>
+    </div>
+
+    <div class="res-seccion">
+      <div class="res-header">Hidratación</div>
+      <div class="res-row"><span class="res-label">Agua a agregar</span><span class="res-valor">${aguaLitros.toFixed(1)} L</span></div>
+      <div class="res-row"><span class="res-label">Peso húmedo estimado</span><span class="res-valor">${pesoHumedo.toFixed(2)} kg <span class="res-sub">(${humedadFinal}% hum.)</span></span></div>
+      <div class="res-row"><span class="res-label">Factor de absorción</span><span class="res-valor">${(pesoHumedo / pesoTotal).toFixed(2)}x <span class="res-sub">por kg seco</span></span></div>
+    </div>
+
+    <div class="res-seccion">
+      <div class="res-header">Producción estimada</div>
+      <div class="res-row"><span class="res-label">Rendimiento mínimo (10%)</span><span class="res-valor">${(pesoHumedo * 0.10).toFixed(2)} kg</span></div>
+      <div class="res-row"><span class="res-label">Rendimiento máximo (20%)</span><span class="res-valor">${(pesoHumedo * 0.20).toFixed(2)} kg</span></div>
+    </div>
+  `;
+}
+
+// Iniciar con 2 componentes por defecto
+document.addEventListener("DOMContentLoaded", () => {
+  agregarComponente();
+  agregarComponente();
+  // Precargar paja de trigo como primer componente
+  const blocks = document.querySelectorAll(".component-block");
+  if (blocks[0]) {
+    blocks[0].querySelector(".comp-material").value = "Paja de trigo";
+    blocks[0].querySelector(".comp-cn").value = 90;
+    blocks[0].querySelector(".comp-pct").value = 80;
+    blocks[0].querySelector(".comp-cn-hint").textContent = "C:N conocido para este material: 90";
+  }
+  if (blocks[1]) {
+    blocks[1].querySelector(".comp-material").value = "Salvado de trigo";
+    blocks[1].querySelector(".comp-cn").value = 17;
+    blocks[1].querySelector(".comp-pct").value = 20;
+    blocks[1].querySelector(".comp-cn-hint").textContent = "C:N conocido para este material: 17";
+  }
+  calcular();
+});
+</script>
+</body>
+</html>

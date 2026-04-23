@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro Producción - Hongos Ostra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1a2540" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Hongos 🍄" />
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">🍄</div>
+    <div>
+      <h1>Registro de Producción</h1>
+      <p class="subtitle">Hongos Ostra · Control integral</p>
+    </div>
+    <div class="header-badge">v2.1</div>
+    <button id="btnInstalarPWA" class="btn-install-pwa" style="display:none;" title="Instalar app en tu dispositivo">
+      📲 Instalar
+    </button>
+    <div id="activeLoteBadge" class="active-lote-badge">
+      <span class="active-lote-label">LOTE ACTIVO</span>
+      <span id="activeLoteIdBadge" class="active-lote-id">—</span>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button onclick="showTab('lotes')" id="tabLotes"><span class="tab-icon">📋</span>Lotes</button>
+  <button onclick="showTab('preparacion')" id="tabPreparacion" class="active"><span class="tab-icon">🌾</span>Preparación</button>
+  <button onclick="showTab('incubacion')" id="tabIncubacion"><span class="tab-icon">🌡</span>Incubación</button>
+  <button onclick="showTab('fructificacion')" id="tabFructificacion"><span class="tab-icon">🍄</span>Fructificación</button>
+  <button onclick="showTab('estadisticas')" id="tabEstadisticas"><span class="tab-icon">📊</span>Estadísticas</button>
+</div>
+
+<main>
+
+  <!-- ===================== LOTES ===================== -->
+  <div id="lotesTab" style="display:none;">
+    <section class="form-section form-section--wide">
+      <div class="section-header">
+        <span class="section-tag">GESTIÓN</span>
+        <h2>Mis Lotes de Producción</h2>
+      </div>
+
+      <div id="batchActiveBanner" class="batch-active-banner" style="display:none;"></div>
+
+      <!-- Crear nuevo lote -->
+      <div class="block-card batch-create-card">
+        <div class="block-label">NUEVO LOTE</div>
+        <div class="batch-create-row">
+          <input type="text" id="newBatchId" placeholder="Ej: LOTE-001, Pleurotus-Mar26, B-12..."
+                 autocomplete="off" class="batch-id-input" />
+          <button type="button" id="btnCrearLote" class="btn-primary btn-crear-lote">+ Crear lote</button>
+        </div>
+        <p class="batch-create-hint">Al crear un lote se convierte en el activo. Todos los datos que ingreses en Inoculación, Incubación y Fructificación se guardan bajo ese lote.</p>
+      </div>
+
+      <!-- Lista de lotes -->
+      <div class="block-card" style="margin-top:14px;">
+        <div class="block-label">LOTES GUARDADOS</div>
+        <div id="batchSelectorContainer" class="batch-selector-grid" style="margin-top:12px;"></div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ===================== PREPARACIÓN ===================== -->
+  <div id="preparacionTab" style="display:none;">
+    <div class="two-col">
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-tag">REGISTRO</span>
+          <h2>Preparación de Sustrato</h2>
+        </div>
+
+        <form id="entryForm">
+          <div class="row">
+            <label>Fecha<input type="date" id="fecha" required /></label>
+            <label>Hora<input type="time" id="hora" required /></label>
+          </div>
+          <div class="row">
+            <label>Hongo
+              <input type="text" id="hongo" placeholder="Pleurotus ostreatus" list="hongos-list" required autocomplete="off" />
+            </label>
+            <label>Cepa<input type="text" id="cepa" placeholder="Mx-01" required /></label>
+          </div>
+          <datalist id="hongos-list">
+            <option value="Pleurotus ostreatus">
+            <option value="Pleurotus eryngii">
+            <option value="Pleurotus djamor">
+            <option value="Pleurotus citrinopileatus">
+            <option value="Pleurotus pulmonarius">
+            <option value="Lentinula edodes">
+            <option value="Hericium erinaceus">
+            <option value="Flammulina velutipes">
+            <option value="Agrocybe aegerita">
+            <option value="Pholiota nameko">
+            <option value="Agaricus bisporus">
+            <option value="Agaricus subrufescens">
+            <option value="Volvariella volvacea">
+            <option value="Stropharia rugosoannulata">
+            <option value="Hypsizygus tessellatus">
+            <option value="Hypsizygus ulmarius">
+            <option value="Tremella fuciformis">
+            <option value="Auricularia auricula-judae">
+            <option value="Ganoderma lucidum">
+            <option value="Ganoderma sichuanense">
+            <option value="Trametes versicolor">
+            <option value="Inonotus obliquus">
+            <option value="Cordyceps militaris">
+            <option value="Phellinus linteus">
+            <option value="Laetiporus sulphureus">
+          </datalist>
+
+          <div class="block-label">SUSTRATO</div>
+
+          <div id="sustratosContainer">
+            <div class="block-card substrate-block" data-substrate-index="0">
+              <h4>Sustrato base</h4>
+              <div class="row">
+                <label>Tipo de Sustrato
+                  <div class="sust-input-wrap">
+                    <input type="text" name="tipoSustrato" placeholder="Paja de trigo" list="sustratos-list" required autocomplete="off" />
+                    <button type="button" class="btn-guardar-sust btn-guardar-sustrato" title="Guardar en mi lista">＋ Guardar</button>
+                  </div>
+                </label>
+                <label>Peso Seco (kg)<input type="number" name="pesoSeco" min="0" step="0.01" placeholder="10" required /></label>
+              </div>
+              <div class="custom-sust-chips sustrato-chips-area"></div>
+              <label class="full">Nutrientes Adicionales
+                <input type="text" name="nutrientes" placeholder="Salvado de trigo, yeso" list="nutrientes-list" autocomplete="off" />
+              </label>
+              <datalist id="sustratos-list">
+                <option value="Paja de trigo">
+                <option value="Paja de arroz">
+                <option value="Paja de cebada">
+                <option value="Paja de avena">
+                <option value="Paja de centeno">
+                <option value="Aserrín de roble">
+                <option value="Aserrín de haya">
+                <option value="Aserrín de álamo">
+                <option value="Aserrín de eucalipto">
+                <option value="Viruta de madera">
+                <option value="Pellets de madera">
+                <option value="Mazorca de maíz triturada">
+                <option value="Rastrojo de maíz">
+                <option value="Bagazo de caña de azúcar">
+                <option value="Cáscara de girasol">
+                <option value="Cáscara de soja">
+                <option value="Pulpa de café">
+                <option value="Cartón corrugado">
+                <option value="Papel periódico triturado">
+              </datalist>
+              <datalist id="nutrientes-list">
+                <option value="Salvado de trigo">
+                <option value="Salvado de arroz">
+                <option value="Salvado de avena">
+                <option value="Harina de maíz">
+                <option value="Yeso agrícola">
+                <option value="Cal hidratada">
+                <option value="Carbonato de calcio">
+                <option value="Harina de soja">
+                <option value="Melaza de caña">
+                <option value="Germen de trigo">
+                <option value="Harina de alfalfa">
+                <option value="Ceniza de madera">
+                <option value="Cascarilla de arroz">
+              </datalist>
+            </div>
+          </div>
+          <!-- sustratosContainer closes here; new substrates are appended inside it via JS -->
+
+          <div class="substrate-actions">
+            <button type="button" class="btn-secondary" id="addSustratoBtn">+ Añadir sustrato</button>
+          </div>
+
+          <div class="block-card">
+            <div class="block-label">PROCESAMIENTO</div>
+            <div class="row">
+              <label>Tiempo de humectación previo (h)<input type="number" id="humectacion" min="0" step="0.1" placeholder="12" required /></label>
+              <label>Tipo de Esterilización<input type="text" id="esterilizacion" placeholder="Pasteurización alcalina" required /></label>
+              <label>Tiempo de esterilización<input type="time" id="tiempoProceso" required /></label>
+            </div>
+          </div>
+
+          <label class="full">Observaciones<textarea id="obs" rows="3"></textarea></label>
+
+          <!-- ═══ INOCULACIÓN (integrado) ═══ -->
+          <div class="block-card" style="margin-top:14px;">
+            <div class="block-label">💉 INOCULACIÓN</div>
+
+            <div class="inoculacion-hint-box" id="inoculacionHint">
+              <span class="hint-icon">💡</span>
+              <span id="inoculacionHintText">Completá el campo Hongo arriba para ver sugerencias de métodos.</span>
+            </div>
+
+            <div class="row" style="margin-top:12px;">
+              <label>ID del Lote de micelio
+                <input type="text" id="loteMicelio" placeholder="MICELIO-001" />
+              </label>
+              <label>Cantidad a usar
+                <div class="input-with-unit">
+                  <input type="number" id="cantidadMicelio" min="0" step="0.1" placeholder="500" />
+                  <select id="unidadMicelio">
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="ml">ml</option>
+                    <option value="L">L</option>
+                  </select>
+                </div>
+              </label>
+            </div>
+            <div class="row">
+              <label>Nº de Unidades inoculadas
+                <input type="number" id="numeroUnidades" min="0" step="1" placeholder="120" />
+              </label>
+              <label>Método de inoculación
+                <input type="text" id="metodoInoculacion" placeholder="Capa por capa" list="metodos-list" autocomplete="off" />
+                <datalist id="metodos-list"></datalist>
+              </label>
+            </div>
+            <div class="row">
+              <label>Ratio Inóculo
+                <input type="text" id="ratioInoculo" placeholder="Ej: 1:5 o 5%" />
+              </label>
+              <label>ID del Lote
+                <input type="text" id="loteId" placeholder="LOTE-001" />
+              </label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn-primary">Guardar registro</button>
+            <button type="button" class="btn-ghost" id="clearBtn">Limpiar</button>
+          </div>
+        </form>
+
+        <div class="stat-pill" style="margin-top:12px;">
+          <span id="totalEntradas">Entradas: 0</span>
+        </div>
+      </section>
+
+      <section class="table-section">
+        <div class="section-header">
+          <span class="section-tag">HISTORIAL</span>
+          <h2>Registros guardados</h2>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="historial-filters block-card">
+          <div class="filters-row">
+            <label class="filter-label">🍄 Hongo
+              <input type="text" id="filterHongo" placeholder="Pleurotus..." autocomplete="off" class="filter-input" />
+            </label>
+            <label class="filter-label">📅 Desde
+              <input type="date" id="filterDesde" class="filter-input" />
+            </label>
+            <label class="filter-label">📅 Hasta
+              <input type="date" id="filterHasta" class="filter-input" />
+            </label>
+            <button type="button" id="btnLimpiarFiltros" class="btn-ghost btn-filter-clear" title="Limpiar filtros">✕ Limpiar</button>
+          </div>
+          <div id="filterStatus" class="filter-status" style="display:none;"></div>
+        </div>
+
+        <div class="table-wrapper">
+          <table id="entriesTable">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Hongo</th>
+                <th>Cepa</th>
+                <th>Sustrato</th>
+                <th>Peso</th>
+                <th>Obs</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== INCUBACIÓN ===================== -->
+  <div id="incubacionTab" style="display:none;">
+    <div class="incub-layout">
+
+      <!-- ── COLUMNA IZQUIERDA: formulario ── -->
+      <div class="incub-left">
+
+        <!-- DATOS DEL LOTE -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">LOTE</span>
+            <h2>Datos generales</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Cantidad de unidades
+                <input type="number" id="cantidadUnidadesIncubacion" min="0" step="1" placeholder="100" />
+              </label>
+              <label>Peso húmedo por unidad (kg)
+                <input type="number" id="pesoHumedoUnidad" min="0" step="0.01" placeholder="1.2" />
+              </label>
+            </div>
+            <div class="row">
+              <label>Fecha de inicio de incubación
+                <input type="date" id="fechaInicioIncubacion" />
+              </label>
+              <label>Días estimados de colonización
+                <input type="number" id="diasEstimadosColonizacion" min="0" step="1" placeholder="18" />
+              </label>
+            </div>
+            <!-- Métricas calculadas inline -->
+            <div class="inline-metrics">
+              <div class="inline-metric">
+                <span class="inline-metric-label">Peso total húmedo</span>
+                <span class="inline-metric-value" id="pesoHumedoTotal">— kg</span>
+              </div>
+              <div class="inline-metric">
+                <span class="inline-metric-label">Fin estimado</span>
+                <span class="inline-metric-value" id="fechaFinEstimada">—</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONDICIONES AMBIENTALES -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">AMBIENTE</span>
+            <h2>Condiciones ambientales</h2>
+          </div>
+          <div class="block-card">
+            <div class="incub-rangos-hint" id="incubRangosHint">
+              <span class="hint-icon">🌡</span>
+              <span id="incubRangosText">Seleccioná un hongo en Preparación para ver rangos ideales.</span>
+            </div>
+            <div class="row" style="margin-top:12px;">
+              <label>🌡 Temperatura (°C)
+                <input type="number" id="tempAmbiente" step="0.1" placeholder="24" />
+                <div class="temp-gauge-wrap"><div class="temp-gauge-bar" id="tempGaugeBar"></div></div>
+                <span class="temp-gauge-label" id="tempGaugeLabel"></span>
+              </label>
+              <label>💧 Humedad relativa (%)
+                <input type="number" id="humedadRelativa" min="0" max="100" step="0.1" placeholder="70" />
+                <div class="temp-gauge-wrap"><div class="temp-gauge-bar" id="humedadGaugeBar"></div></div>
+                <span class="temp-gauge-label" id="humedadGaugeLabel"></span>
+              </label>
+            </div>
+            <div class="row">
+              <label>🌬 Ventilación
+                <select id="ventilacionIncubacion">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Sin ventilación">Sin ventilación</option>
+                  <option value="Baja">Baja</option>
+                  <option value="Media">Media</option>
+                  <option value="Alta">Alta</option>
+                  <option value="Flujo laminar">Flujo laminar</option>
+                </select>
+              </label>
+              <label>🌑 Luz
+                <select id="luzIncubacion">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Oscuridad total">Oscuridad total</option>
+                  <option value="Luz baja indirecta">Luz baja indirecta</option>
+                  <option value="Luz natural filtrada">Luz natural filtrada</option>
+                  <option value="Luz artificial 12h">Luz artificial 12h</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONTROL DIARIO -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">SEGUIMIENTO</span>
+            <h2>Registro diario de colonización</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Día desde inoculación
+                <input type="number" id="diaDesdeInoculacion" min="0" step="1" placeholder="12" />
+              </label>
+              <label>% colonización estimado
+                <input type="number" id="colonizacionEstimada" min="0" max="100" step="1" placeholder="75" />
+              </label>
+            </div>
+
+            <!-- Barra de progreso de colonización -->
+            <div class="colonizacion-barra-wrap">
+              <div class="colonizacion-barra-bg">
+                <div class="colonizacion-barra-fill" id="colonizacionBarra" style="width:0%"></div>
+              </div>
+              <span class="colonizacion-barra-pct" id="colonizacionBarraPct">0%</span>
+            </div>
+
+            <fieldset class="checklist-fieldset" style="margin-top:12px;">
+              <legend>Observaciones visuales</legend>
+              <div class="checklist-grid">
+                <label class="check-ok"><input type="checkbox" id="obsMicelioUniforme" /> Micelio blanco uniforme ✔</label>
+                <label class="check-ok"><input type="checkbox" id="obsMicelioDenso" /> Micelio denso y robusto ✔</label>
+                <label class="check-warn"><input type="checkbox" id="obsExcesoHumedad" /> Exceso de humedad ⚠</label>
+                <label class="check-warn"><input type="checkbox" id="obsMicelioDébil" /> Micelio débil o escaso ⚠</label>
+                <label class="check-danger"><input type="checkbox" id="obsManchasVerdes" /> Manchas verdes (Trichoderma) 🔴</label>
+                <label class="check-danger"><input type="checkbox" id="obsManchasNegras" /> Manchas negras 🔴</label>
+                <label class="check-danger"><input type="checkbox" id="obsOlorExtrano" /> Olor extraño / pútrido 🔴</label>
+                <label class="check-danger"><input type="checkbox" id="obsManchasNaranjas" /> Manchas naranjas (Neurospora) 🔴</label>
+              </div>
+            </fieldset>
+            <div class="actions" style="margin-top:12px;">
+              <button type="button" class="btn-primary" id="guardarControlDiario">+ Guardar control del día</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONTAMINACIÓN -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">CONTAMINACIÓN</span>
+            <h2>Control de contaminación</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Unidades contaminadas
+                <input type="number" id="bolsasContaminadas" min="0" step="1" placeholder="8" />
+              </label>
+              <label>% de descarte manual
+                <input type="number" id="descarteLote" min="0" max="100" step="0.1" placeholder="Dejar vacío para calcular automático" />
+              </label>
+            </div>
+            <div class="row">
+              <label>Tipo de contaminación
+                <input type="text" id="tipoContaminacion" placeholder="Trichoderma" list="contaminacion-list" autocomplete="off" />
+                <datalist id="contaminacion-list">
+                  <option value="Trichoderma (verde)">
+                  <option value="Neurospora (naranja)">
+                  <option value="Mucor (gris/negro)">
+                  <option value="Aspergillus (negro/verde oscuro)">
+                  <option value="Bacterias (húmedo/amarillo)">
+                  <option value="Levaduras (olor fermentado)">
+                  <option value="Penicillium (azul/verde claro)">
+                  <option value="Contaminación mixta">
+                </datalist>
+              </label>
+              <label>Acción tomada
+                <select id="accionTomada">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Aislamiento inmediato">Aislamiento inmediato</option>
+                  <option value="Eliminación">Eliminación</option>
+                  <option value="Cuarentena preventiva">Cuarentena preventiva</option>
+                  <option value="Tratamiento con cal">Tratamiento con cal</option>
+                  <option value="Observación continua">Observación continua</option>
+                  <option value="Sin acción (contaminación menor)">Sin acción (contaminación menor)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- CIERRE DE INCUBACIÓN -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">CIERRE</span>
+            <h2>Fin de incubación</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Fecha real fin de incubación
+                <input type="date" id="fechaFinIncubacion" />
+              </label>
+              <label>Días totales hasta 100% colonización
+                <input type="number" id="diasColonizacionTotal" min="0" step="1" placeholder="18" />
+              </label>
+            </div>
+            <label class="full">Observación final del lote
+              <textarea id="observacionFinalLote" placeholder="Describe estado final, calidad del micelio, anomalías..." rows="3"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <!-- REGISTRO POR UNIDAD — INCUBACIÓN -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">UNIDADES</span>
+            <h2>Control por unidad</h2>
+          </div>
+          <div class="block-card unidades-form-card">
+            <div class="block-label">AGREGAR / EDITAR UNIDAD</div>
+            <div class="unidades-form-grid">
+              <label class="u-label">N° Tarro / Bolsa
+                <input type="text" id="uNumero" placeholder="Ej: T-01, B-12" autocomplete="off" class="u-input" />
+              </label>
+              <label class="u-label">Peso inicial (kg)
+                <input type="number" id="uPesoInicial" placeholder="1.20" step="0.01" min="0" class="u-input" />
+              </label>
+              <label class="u-label u-cont-label">Contaminación
+                <div class="u-cont-row">
+                  <select id="uContaminacion" class="u-select">
+                    <option value="no">✅ Sin contaminación</option>
+                    <option value="si">🔴 Con contaminación</option>
+                  </select>
+                  <div class="u-pct-wrap" id="uPctWrap" style="display:none;">
+                    <input type="number" id="uContPct" placeholder="%" min="0" max="100" step="1" class="u-input u-pct" />
+                    <span class="u-pct-sign">%</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+            <div class="u-obs-row">
+              <label class="u-label u-label--full">Observaciones
+                <input type="text" id="uObs" placeholder="Ej: buen micelio, sin contaminación..." autocomplete="off" class="u-input" />
+              </label>
+            </div>
+            <div class="actions" style="margin-top:12px;">
+              <button type="button" id="btnGuardarUnidad" class="btn-primary">+ Guardar unidad</button>
+              <button type="button" id="btnLimpiarUnidad" class="btn-ghost">Limpiar</button>
+            </div>
+          </div>
+
+          <!-- Métricas resumen -->
+          <div class="block-card unidades-metricas" id="unidadesMetricas" style="margin-top:14px; display:none;">
+            <div class="block-label">RESUMEN DEL LOTE</div>
+            <div class="u-metrics-grid">
+              <div class="u-metric"><span class="u-metric-label">Unidades</span><span class="u-metric-val" id="umTotal">—</span></div>
+              <div class="u-metric"><span class="u-metric-label">Contaminadas</span><span class="u-metric-val u-danger" id="umContaminadas">—</span></div>
+              <div class="u-metric"><span class="u-metric-label">% contaminación</span><span class="u-metric-val u-danger" id="umPctCont">—</span></div>
+              <div class="u-metric"><span class="u-metric-label">Peso inicial total</span><span class="u-metric-val" id="umPesoTotal">—</span></div>
+            </div>
+          </div>
+
+          <!-- Tabla de unidades -->
+          <div class="block-card" style="margin-top:14px;">
+            <div class="block-label" style="margin-bottom:10px;">LISTADO DE UNIDADES</div>
+            <div class="u-search-row">
+              <input type="text" id="uFiltro" placeholder="🔍 Buscar..." class="filter-input" autocomplete="off" />
+              <button type="button" id="btnExportUnidades" class="btn-secondary" style="white-space:nowrap;">📊 Exportar</button>
+            </div>
+            <div class="u-table-wrap">
+              <table id="unidadesTable" class="u-table">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>Peso ini.</th>
+                    <th>Contam.</th>
+                    <th>%</th>
+                    <th>Obs.</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="unidadesTbody"></tbody>
+              </table>
+            </div>
+            <div id="unidadesEmptyMsg" class="empty-msg" style="padding:20px 0; text-align:center;">
+              No hay unidades registradas para este lote.
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /incub-left -->
+
+      <!-- ── COLUMNA DERECHA: panel de métricas y historial ── -->
+      <div class="incub-right">
+
+        <!-- SEMÁFORO -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">ESTADO</span>
+            <h2>Semáforo del lote</h2>
+          </div>
+          <div class="semaforo-card">
+            <div id="semaforoEstado" class="semaforo-text">⚪ Sin datos aún</div>
+            <div class="semaforo-detail" id="semaforoDetalle"></div>
+          </div>
+          <div class="metrics-grid" style="margin-top:12px;">
+            <div class="metric-card">
+              <div class="metric-label">Peso total húmedo</div>
+              <div class="metric-value" id="metricPesoTotal">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Días incubación</div>
+              <div class="metric-value" id="promedioColonizacion">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Eficiencia del lote</div>
+              <div class="metric-value" id="eficienciaLote">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Tasa contaminación</div>
+              <div class="metric-value" id="tasaContaminacion">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Fin estimado</div>
+              <div class="metric-value metric-value--sm" id="metricFechaFin">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Colonización actual</div>
+              <div class="metric-value" id="metricColonizacion">—</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- HISTORIAL DIARIO -->
+        <section class="form-section" style="margin-top:14px;">
+          <div class="section-header">
+            <span class="section-tag">HISTORIAL</span>
+            <h2>Controles registrados</h2>
+          </div>
+          <div id="historialIncubacion" class="historial-incub">
+            <p class="empty-msg">No hay controles registrados aún.</p>
+          </div>
+        </section>
+
+      </div><!-- /incub-right -->
+
+    </div><!-- /incub-layout -->
+  </div>
+
+  <!-- ===================== FRUCTIFICACIÓN ===================== -->
+  <div id="fructificacionTab" style="display:none;">
+    <div class="fruct-layout">
+
+      <!-- ── COLUMNA IZQUIERDA ── -->
+      <div class="fruct-left">
+
+        <!-- DATOS DEL LOTE -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">LOTE</span>
+            <h2>Datos del lote</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Fecha ingreso a sala de fructificación
+                <input type="date" id="fechaIngreso">
+              </label>
+              <label>Peso seco total del sustrato (kg)
+                <input type="number" id="pesoSeco" step="0.01" placeholder="50">
+              </label>
+            </div>
+            <div class="row">
+              <label>Rendimiento biológico esperado (%)
+                <input type="number" id="rendimientoEsperado" step="0.1" min="0" max="200" placeholder="Ej: 80">
+              </label>
+              <label>Número de unidades
+                <input type="number" id="unidadesFruct" step="1" min="0" placeholder="Ej: 100">
+              </label>
+            </div>
+            <!-- Producción esperada calculada -->
+            <div class="inline-metrics" style="margin-top:10px;">
+              <div class="inline-metric">
+                <span class="inline-metric-label">Producción esperada</span>
+                <span class="inline-metric-value" id="produccionEsperada">—</span>
+              </div>
+              <div class="inline-metric">
+                <span class="inline-metric-label">Kg/unidad esperado</span>
+                <span class="inline-metric-value" id="kgPorUnidadEsperado">—</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONDICIONES DE SALA -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">SALA</span>
+            <h2>Condiciones ambientales</h2>
+          </div>
+          <div class="block-card">
+            <div class="fruct-rangos-hint" id="fructRangosHint">
+              <span class="hint-icon">💡</span>
+              <span id="fructRangosText">Seleccioná un hongo en Preparación para ver rangos ideales de fructificación.</span>
+            </div>
+            <div class="row" style="margin-top:12px;">
+              <label>🌡 Temperatura (°C)
+                <input type="number" id="tempFruct" step="0.1" placeholder="18">
+                <div class="temp-gauge-wrap"><div class="temp-gauge-bar" id="tempFructGaugeBar"></div></div>
+                <span class="temp-gauge-label" id="tempFructGaugeLabel"></span>
+              </label>
+              <label>💧 Humedad relativa (%)
+                <input type="number" id="hrFruct" min="0" max="100" step="0.1" placeholder="85">
+                <div class="temp-gauge-wrap"><div class="temp-gauge-bar" id="hrFructGaugeBar"></div></div>
+                <span class="temp-gauge-label" id="hrFructGaugeLabel"></span>
+              </label>
+            </div>
+            <div class="row">
+              <label>💨 CO₂ / Ventilación
+                <select id="ventFruct">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Alta (CO₂ bajo)">Alta — CO₂ bajo (recomendado)</option>
+                  <option value="Media">Media</option>
+                  <option value="Baja (CO₂ alto)">Baja — CO₂ alto (evitar)</option>
+                  <option value="Flujo laminar">Flujo laminar</option>
+                </select>
+              </label>
+              <label>💡 Fotoperíodo
+                <select id="luzFruct">
+                  <option value="">— Seleccionar —</option>
+                  <option value="12h luz / 12h oscuridad">12h luz / 12h oscuridad</option>
+                  <option value="16h luz / 8h oscuridad">16h luz / 8h oscuridad</option>
+                  <option value="Luz natural">Luz natural</option>
+                  <option value="Oscuridad total">Oscuridad total</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- INDUCCIÓN / PINNING -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">INDUCCIÓN</span>
+            <h2>Pinning y primordios</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>Fecha de inicio de primordios
+                <input type="date" id="fechaPrimordios">
+              </label>
+              <label>Días hasta aparición de primordios
+                <input type="number" id="diasPrimordios" min="0" step="1" placeholder="3">
+              </label>
+            </div>
+            <div class="block-label" style="margin-top:10px;">MÉTODO DE INDUCCIÓN</div>
+            <div class="row">
+              <label>Técnica usada
+                <select id="tecnicaInduccion">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Shock térmico (agua fría)">Shock térmico — agua fría</option>
+                  <option value="Rasqueteado superficial">Rasqueteado superficial</option>
+                  <option value="Perforación lateral de bolsa">Perforación lateral de bolsa</option>
+                  <option value="Apertura de bolsa completa">Apertura de bolsa completa</option>
+                  <option value="Corte de tapa">Corte de tapa</option>
+                  <option value="Inmersión en agua 12-24h">Inmersión en agua 12–24h</option>
+                  <option value="Sin intervención (natural)">Sin intervención — natural</option>
+                </select>
+              </label>
+              <label>Densidad de pinning
+                <select id="densidadPinning">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Alta (>20 primordios/unidad)">Alta — más de 20 primordios/unidad</option>
+                  <option value="Media (10–20)">Media — 10 a 20 por unidad</option>
+                  <option value="Baja (<10)">Baja — menos de 10 por unidad</option>
+                  <option value="Sin pinning aún">Sin pinning aún</option>
+                </select>
+              </label>
+            </div>
+            <fieldset class="checklist-fieldset" style="margin-top:10px;">
+              <legend>Observaciones de pinning</legend>
+              <div class="checklist-grid">
+                <label class="check-ok"><input type="checkbox" id="pinUniforme" /> Pinning uniforme ✔</label>
+                <label class="check-ok"><input type="checkbox" id="primordiosSanos" /> Primordios sanos ✔</label>
+                <label class="check-warn"><input type="checkbox" id="pinLento" /> Pinning lento ⚠</label>
+                <label class="check-warn"><input type="checkbox" id="primordiosAborto" /> Aborto de primordios ⚠</label>
+                <label class="check-danger"><input type="checkbox" id="pileoDeformado" /> Píleo deformado (CO₂ alto) 🔴</label>
+                <label class="check-danger"><input type="checkbox" id="hongosSecos" /> Cuerpos fructíferos secos 🔴</label>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- REGISTRAR FLUSH -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">COSECHA</span>
+            <h2>Registrar flush</h2>
+          </div>
+          <div class="block-card">
+            <div class="row">
+              <label>N° Flush
+                <input type="number" id="flushNumero" min="1" placeholder="1">
+              </label>
+              <label>Fecha de cosecha
+                <input type="date" id="fechaFlush">
+              </label>
+            </div>
+            <div class="row">
+              <label>Kg cosechados
+                <input type="number" id="kgFlush" step="0.01" placeholder="0.0">
+              </label>
+              <label>Calidad
+                <select id="calidadFlush">
+                  <option value="">— Seleccionar —</option>
+                  <option value="Premium">⭐ Premium</option>
+                  <option value="Estándar">✔ Estándar</option>
+                  <option value="Descarte parcial">⚠ Descarte parcial</option>
+                  <option value="Descarte total">✕ Descarte total</option>
+                </select>
+              </label>
+            </div>
+            <label class="full">Observaciones del flush
+              <input type="text" id="obsFlush" placeholder="Ej: buen tamaño, píleo uniforme, sin contaminación" autocomplete="off">
+            </label>
+            <button type="button" class="btn-primary" id="btnAgregarFlush">+ Agregar cosecha</button>
+          </div>
+        </section>
+
+      </div><!-- /fruct-left -->
+
+      <!-- ── COLUMNA DERECHA: métricas + historial ── -->
+      <div class="fruct-right">
+
+        <!-- SEMÁFORO -->
+        <section class="form-section">
+          <div class="section-header">
+            <span class="section-tag">ESTADO</span>
+            <h2>Estado del lote</h2>
+          </div>
+          <div class="semaforo-card">
+            <div id="fructSemaforoEstado" class="semaforo-text">⚪ Sin datos aún</div>
+            <div class="semaforo-detail" id="fructSemaforoDetalle"></div>
+          </div>
+
+          <!-- Estado manual del lote -->
+          <div class="block-card" style="margin-top:10px;">
+            <div class="block-label">CICLO DEL LOTE</div>
+            <div class="row" style="margin-top:8px;">
+              <label>Flushes esperados
+                <input type="number" id="flushesEsperados" min="1" step="1" placeholder="3">
+              </label>
+              <label>Estado
+                <span id="fructEstadoLote" style="font-family:'Space Mono',monospace;font-size:0.85rem;color:var(--accent);display:block;margin-top:6px;">🟢 Activo</span>
+              </label>
+            </div>
+            <!-- Barra de progreso de flushes -->
+            <div class="colonizacion-barra-wrap" style="margin-top:8px;">
+              <div class="colonizacion-barra-bg">
+                <div class="colonizacion-barra-fill" id="fructFlushProgresoBarra" style="width:0%;background:var(--accent2)"></div>
+              </div>
+              <span class="colonizacion-barra-pct" id="fructFlushProgresoLabel" style="color:var(--accent2)">—</span>
+            </div>
+            <!-- Botones de estado -->
+            <div class="estado-btns" style="margin-top:10px;">
+              <button type="button" class="estado-btn estado-btn--active" id="btnEstadoActivo">🟢 Activo</button>
+              <button type="button" class="estado-btn" id="btnEstadoAgotado">✅ Agotado</button>
+              <button type="button" class="estado-btn" id="btnEstadoDescartado">⛔ Descartado</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- RENDIMIENTO -->
+        <section class="form-section" style="margin-top:10px;">
+          <div class="section-header">
+            <span class="section-tag">RENDIMIENTO</span>
+            <h2>Métricas del lote</h2>
+          </div>
+          <div class="fruct-rendimiento-card">
+            <div class="fruct-rendimiento-valor" id="fructRendimientoValor">—</div>
+            <div class="fruct-rendimiento-label">Rendimiento Biológico</div>
+            <div class="fruct-rendimiento-barra-wrap">
+              <div class="fruct-rendimiento-barra" id="fructRendimientoBarra" style="width:0%"></div>
+            </div>
+            <div class="fruct-rendimiento-meta" id="fructRendimientoMeta"></div>
+          </div>
+
+          <div class="metrics-grid" style="margin-top:10px; grid-template-columns:1fr 1fr;">
+            <div class="metric-card">
+              <div class="metric-label">Total producido</div>
+              <div class="metric-value" id="fructTotalKg">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Flushes</div>
+              <div class="metric-value" id="fructNumFlushes">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Mejor flush</div>
+              <div class="metric-value metric-value--sm" id="fructMejorFlush">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Promedio/flush</div>
+              <div class="metric-value" id="fructPromedioFlush">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Kg/unidad</div>
+              <div class="metric-value" id="fructKgUnidad">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Días al 1er flush</div>
+              <div class="metric-value" id="fructDiasPrimerFlush">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Intervalo entre flushes</div>
+              <div class="metric-value" id="fructIntervaloPromedio">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Próximo flush est.</div>
+              <div class="metric-value metric-value--sm" id="fructProximoFlush">—</div>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:12px; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" onclick="exportarJSON()">📦 Exportar JSON</button>
+            <button type="button" class="btn-secondary btn-csv" onclick="exportarCSV()">📊 Exportar CSV</button>
+          </div>
+        </section>
+
+        <!-- GRÁFICO DE FLUSHES -->
+        <section class="form-section" style="margin-top:10px;">
+          <div class="section-header">
+            <span class="section-tag">GRÁFICO</span>
+            <h2>Evolución de cosechas</h2>
+          </div>
+          <div class="flush-chart-wrap">
+            <canvas id="flushChartCanvas"></canvas>
+            <p class="empty-msg" id="flushChartEmpty" style="display:none;">Registrá cosechas para ver el gráfico.</p>
+          </div>
+        </section>
+
+        <!-- HISTORIAL DE FLUSHES -->
+        <section class="form-section" style="margin-top:10px;">
+          <div class="section-header">
+            <span class="section-tag">HISTORIAL</span>
+            <h2>Cosechas registradas</h2>
+          </div>
+          <div id="flushList" class="flush-list">
+            <p class="empty-msg">No hay cosechas registradas aún.</p>
+          </div>
+        </section>
+
+        <!-- REGISTRO DE FLUSHES POR UNIDAD -->
+        <section class="form-section" style="margin-top:10px;">
+          <div class="section-header">
+            <span class="section-tag">POR UNIDAD</span>
+            <h2>Cosecha por tarro/bolsa</h2>
+          </div>
+          <div class="block-card">
+            <div class="block-label">AGREGAR COSECHA A UNIDAD</div>
+            <div class="unidades-form-grid">
+              <label class="u-label">N° Tarro / Bolsa
+                <input type="text" id="uFructNumero" placeholder="Ej: T-01" autocomplete="off" class="u-input" />
+              </label>
+              <label class="u-label">Flush 1 (kg)
+                <input type="number" id="uF1" placeholder="0.00" step="0.001" min="0" class="u-input u-flush" />
+              </label>
+              <label class="u-label">Flush 2 (kg)
+                <input type="number" id="uF2" placeholder="0.00" step="0.001" min="0" class="u-input u-flush" />
+              </label>
+              <label class="u-label">Flush 3 (kg)
+                <input type="number" id="uF3" placeholder="0.00" step="0.001" min="0" class="u-input u-flush" />
+              </label>
+            </div>
+            <div class="actions" style="margin-top:12px;">
+              <button type="button" id="btnGuardarFlushUnidad" class="btn-primary">+ Guardar cosecha de unidad</button>
+            </div>
+          </div>
+
+          <!-- Métricas por unidad -->
+          <div class="block-card" id="fructUnidadesMetricas" style="margin-top:14px; display:none;">
+            <div class="block-label">RESUMEN POR UNIDAD</div>
+            <div class="u-metrics-grid">
+              <div class="u-metric"><span class="u-metric-label">Total cosechado</span><span class="u-metric-val u-accent" id="fuKgTotal">—</span></div>
+              <div class="u-metric"><span class="u-metric-label">Rendimiento bio.</span><span class="u-metric-val u-accent" id="fuRendimiento">—</span></div>
+              <div class="u-metric"><span class="u-metric-label">Mejor unidad</span><span class="u-metric-val u-accent2" id="fuMejor">—</span></div>
+              <div class="u-metric"><span class="u-metric-label">Promedio/unidad</span><span class="u-metric-val" id="fuPromedio">—</span></div>
+            </div>
+          </div>
+
+          <!-- Tabla unidades fructificación -->
+          <div class="block-card" style="margin-top:14px;">
+            <div class="block-label" style="margin-bottom:10px;">DETALLE POR UNIDAD</div>
+            <div class="u-table-wrap">
+              <table id="fructUnidadesTable" class="u-table">
+                <thead>
+                  <tr>
+                    <th>N°</th>
+                    <th>F1 (kg)</th>
+                    <th>F2 (kg)</th>
+                    <th>F3 (kg)</th>
+                    <th>Total</th>
+                    <th>RB%</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="fructUnidadesTbody"></tbody>
+              </table>
+            </div>
+            <div id="fructUnidadesEmptyMsg" class="empty-msg" style="padding:20px 0; text-align:center;">
+              No hay unidades con cosecha registrada aún.
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /fruct-right -->
+
+    </div><!-- /fruct-layout -->
+  </div>
+
+
+  <!-- ===================== ESTADÍSTICAS ===================== -->
+  <div id="estadisticasTab" style="display:none;">
+    <section class="form-section form-section--wide">
+      <div class="section-header">
+        <span class="section-tag">ANÁLISIS</span>
+        <h2>Estadísticas comparativas</h2>
+      </div>
+      <div id="statsContainer" class="stats-container"></div>
+    </section>
+  </div>
+
+</main>
+
+<footer>
+  <small>🍄 Proyecto Producción Hongos Ostra &nbsp;·&nbsp; <span id="footerYear"></span></small>
+</footer>
+
+<script src="app.js" defer></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").then((reg) => {
+        // Check for updates every time the app loads
+        reg.update();
+      }).catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

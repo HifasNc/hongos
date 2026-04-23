@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora de Pasteurización · Hongos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg:#1e2b42;--card:#243050;--card2:#2a3860;--border:#334470;
+  --muted:#7a90b8;--muted2:#a0b4d0;--accent:#a3cf36;--accent2:#22d3ee;
+  --accent3:#f59e0b;--text:#dde8f0;--surface:#1a2540;--danger:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+.bg-glow{position:fixed;top:-180px;left:50%;transform:translateX(-50%);width:700px;height:360px;background:radial-gradient(ellipse,rgba(163,207,54,0.05) 0%,transparent 65%);pointer-events:none;z-index:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--surface);color:var(--text);padding:24px 28px 48px;position:relative;z-index:1;min-height:100vh;font-size:14px;line-height:1.6;}
+header{margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.header-inner{display:flex;align-items:center;gap:14px;}
+.logo-mark{font-size:1.7rem;line-height:1;}
+h1{font-family:'DM Sans',sans-serif;font-size:1.05rem;font-weight:600;}
+.subtitle{font-size:0.75rem;color:var(--muted);margin-top:1px;}
+.header-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);border:1px solid rgba(163,207,54,0.3);padding:3px 10px;border-radius:20px;background:rgba(163,207,54,0.06);text-decoration:none;}
+.header-badge:hover{background:rgba(163,207,54,0.12);}
+.layout{display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start;}
+.left{display:flex;flex-direction:column;gap:14px;}
+.right{position:sticky;top:16px;display:flex;flex-direction:column;gap:14px;}
+.form-section{background:var(--card);padding:20px;border-radius:12px;border:1px solid var(--border);}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.section-header::before{content:'';display:block;width:3px;height:20px;background:var(--accent);border-radius:2px;flex-shrink:0;opacity:0.75;}
+.section-header h2{font-size:0.88rem;font-weight:600;color:var(--text);}
+.section-tag{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;background:var(--card2);border:1px solid var(--border);padding:2px 8px;border-radius:4px;margin-left:auto;}
+.block-label{font-size:0.65rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;font-weight:500;}
+.row{display:flex;gap:10px;margin-bottom:10px;}
+.row label{flex:1;}
+label{display:block;font-size:0.76rem;font-weight:500;color:var(--muted2);margin-bottom:5px;}
+input,select{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.84rem;transition:border-color 0.18s,box-shadow 0.18s;margin-top:5px;}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(163,207,54,0.08);}
+input::placeholder{color:#2e3d52;}
+option{background:var(--card2);color:var(--text);}
+.field-hint{font-size:0.68rem;color:var(--muted);display:block;margin-top:4px;font-style:italic;}
+.field-hint.ok{color:var(--accent);font-style:normal;}
+.field-hint.warn{color:var(--accent3);font-style:normal;}
+.field-hint.bad{color:var(--danger);font-style:normal;}
+
+/* Método hint */
+.metodo-hint{display:flex;gap:10px;align-items:flex-start;background:rgba(163,207,54,0.05);border:1px solid rgba(163,207,54,0.16);border-radius:8px;padding:10px 14px;font-size:0.78rem;color:var(--muted2);line-height:1.6;margin-top:10px;}
+.hint-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+/* Ingredientes */
+.ingr-block{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.ingr-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.ingr-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);}
+.btn-remove{background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 9px;font-size:0.72rem;cursor:pointer;}
+.btn-remove:hover{background:rgba(239,68,68,0.16);}
+.btn-add{background:rgba(163,207,54,0.08);color:var(--accent);border:1px solid rgba(163,207,54,0.25);border-radius:8px;padding:8px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.18s;}
+.btn-add:hover{background:rgba(163,207,54,0.15);}
+
+/* Resultados */
+.res-panel{display:flex;flex-direction:column;gap:10px;}
+.res-seccion{background:var(--card2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.res-header{padding:8px 12px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);font-size:0.68rem;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.06em;}
+.res-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 12px;border-bottom:1px solid rgba(51,68,112,0.6);gap:8px;}
+.res-row:last-child{border-bottom:none;}
+.res-label{font-size:0.78rem;color:var(--muted2);flex:1;}
+.res-valor{font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--accent);text-align:right;}
+.res-sub{font-size:0.63rem;font-weight:400;color:var(--muted);margin-left:4px;}
+.res-highlight{background:rgba(163,207,54,0.06);border:1px solid rgba(163,207,54,0.2);border-radius:10px;padding:14px 16px;}
+.res-big{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent);line-height:1;}
+.res-big-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;}
+.res-highlight2{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);border-radius:10px;padding:14px 16px;}
+.res-big2{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent2);line-height:1;}
+.res-highlight3{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:14px 16px;}
+.res-big3{font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent3);line-height:1;}
+
+/* Rango de tarros */
+.tarros-range{display:flex;align-items:center;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-top:4px;}
+.tarros-range-item{flex:1;padding:12px 10px;text-align:center;background:var(--card2);}
+.tarros-range-item:not(:last-child){border-right:1px solid var(--border);}
+.tarros-range-val{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;}
+.tarros-range-label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+.tarros-range-item.center .tarros-range-val{color:var(--accent);font-size:1.8rem;}
+.tarros-range-item.side .tarros-range-val{color:var(--muted2);}
+
+/* Info box */
+.info-box{background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.14);border-radius:8px;padding:10px 12px;font-size:0.75rem;color:var(--muted2);}
+.info-box b{color:var(--accent2);}
+.warn-box{background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px 12px;font-size:0.75rem;color:var(--muted2);}
+.warn-box b{color:var(--accent3);}
+
+.empty-msg{color:var(--muted);font-size:0.82rem;padding:24px 0;text-align:center;}
+button.btn-calc{width:100%;padding:11px;background:var(--accent);color:#0c1a00;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.18s;}
+button.btn-calc:hover{background:#bce254;}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:0.76rem;text-align:center;}
+footer a{color:var(--accent);text-decoration:none;}
+@media(max-width:960px){.layout{grid-template-columns:1fr;}.right{position:static;}}
+@media(max-width:600px){body{padding:12px 14px 32px;}.row{flex-direction:column;}}
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">⚗️</div>
+    <div><h1>Calculadora de Pasteurización</h1><p class="subtitle">Hongos · Sustrato seco → peso húmedo → tarros</p></div>
+    <a href="index.html" class="header-badge">← Inicio</a>
+  </div>
+</header>
+
+<main>
+<div class="layout">
+<div class="left">
+
+  <!-- MÉTODO -->
+  <section class="form-section">
+    <div class="section-header"><h2>Método de pasteurización</h2><span class="section-tag">PASO 1</span></div>
+    <label>Tipo de pasteurización
+      <select id="tipoPasteurizacion" onchange="onMetodoChange()">
+        <option value="agua_caliente">Agua caliente (70–80°C) · inmersión</option>
+        <option value="alcalina">Alcalina / Encalado (pH 12) · sin calor</option>
+        <option value="vapor">Vapor (90–100°C) · presión atmosférica</option>
+        <option value="autoclave">Autoclave / Vapor a presión (121°C)</option>
+        <option value="hidratacion_fria">Hidratación en frío + Cal</option>
+      </select>
+    </label>
+    <div class="metodo-hint" id="metodoHint">
+      <span class="hint-icon">💡</span>
+      <span id="metodoHintText"></span>
+    </div>
+
+    <!-- Parámetros dinámicos del método -->
+    <div id="paramBlock" style="margin-top:14px;"></div>
+  </section>
+
+  <!-- FORMULACIÓN EN SECO -->
+  <section class="form-section">
+    <div class="section-header"><h2>Formulación en seco</h2><span class="section-tag">PASO 2</span></div>
+    <p class="field-hint" style="margin-bottom:12px;">
+      Ingresá todos los ingredientes en peso seco. La base es 100%; los aditivos (salvado, yeso, etc.) se expresan como % sobre el peso de la base.
+    </p>
+
+    <div id="ingredientesContainer"></div>
+    <button type="button" class="btn-add" onclick="agregarIngrediente()" style="margin-top:4px;">+ Agregar ingrediente</button>
+
+    <div class="row" style="margin-top:16px;">
+      <label>Peso base seco (kg)
+        <input type="number" id="pesoBaseSeco" min="0.1" step="0.1" placeholder="5" oninput="calcular()">
+        <span class="field-hint">Ej: 5 kg de paja seca</span>
+      </label>
+      <label>% humedad del material antes de pasteurizar
+        <input type="number" id="humedadInicial" min="0" max="30" step="1" value="12" oninput="calcular()">
+        <span class="field-hint">Paja seca almacenada ≈ 10–14%</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- RECIPIENTES -->
+  <section class="form-section">
+    <div class="section-header"><h2>Recipientes</h2><span class="section-tag">PASO 3</span></div>
+    <div class="row">
+      <label>Tipo de recipiente
+        <select id="tipoRecipiente" onchange="onRecipienteChange()">
+          <option value="">— Seleccioná —</option>
+          <optgroup label="Tarros de vidrio">
+            <option value="tarro_350">Tarro 350 cc</option>
+            <option value="tarro_500">Tarro 500 cc</option>
+            <option value="tarro_750">Tarro 750 cc</option>
+            <option value="tarro_1000">Tarro 1000 cc</option>
+            <option value="tarro_1500">Tarro 1500 cc</option>
+            <option value="tarro_2000">Tarro 2000 cc</option>
+            <option value="tarro_10L" selected>Tarro 10 litros</option>
+          </optgroup>
+          <optgroup label="Bolsas">
+            <option value="bolsa_pequeña">Bolsa pequeña (~0.5 kg húmedo)</option>
+            <option value="bolsa_1kg">Bolsa 1 kg húmedo</option>
+            <option value="bolsa_2kg">Bolsa 2 kg húmedo</option>
+            <option value="bolsa_3kg">Bolsa 3 kg húmedo</option>
+            <option value="bolsa_5kg">Bolsa 5 kg húmedo</option>
+          </optgroup>
+          <option value="custom">Personalizado</option>
+        </select>
+      </label>
+      <label>Kg húmedo por recipiente (referencia)
+        <input type="number" id="kgHumedoXRec" min="0.1" step="0.1" placeholder="3.00" oninput="calcular()">
+        <span class="field-hint" id="hintRecipiente">Peso húmedo que cargás en cada unidad</span>
+      </label>
+    </div>
+    <div class="row">
+      <label>% margen por contaminación
+        <input type="range" id="margenContam" min="0" max="30" step="1" value="10"
+               oninput="document.getElementById('margenContamVal').textContent=this.value+'%';calcular()">
+        <div style="display:flex;justify-content:space-between;margin-top:3px;">
+          <span class="field-hint">0%</span>
+          <span style="font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--accent2);" id="margenContamVal">10%</span>
+          <span class="field-hint">30%</span>
+        </div>
+        <span class="field-hint">Unidades extra para cubrir posibles pérdidas</span>
+      </label>
+      <label>% tasa de inoculación (sobre peso húmedo)
+        <input type="range" id="tasaSpawn" min="1" max="20" step="0.5" value="5"
+               oninput="document.getElementById('tasaSpawnVal').textContent=this.value+'%';calcular()">
+        <div style="display:flex;justify-content:space-between;margin-top:3px;">
+          <span class="field-hint">1%</span>
+          <span style="font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--accent);" id="tasaSpawnVal">5%</span>
+          <span class="field-hint">20%</span>
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <button type="button" class="btn-calc" onclick="calcular()">⚡ Calcular</button>
+
+</div><!-- /left -->
+
+<!-- RESULTADOS -->
+<div class="right">
+  <section class="form-section">
+    <div class="section-header"><h2>Resultados</h2></div>
+    <div id="resultadoPanel" class="res-panel">
+      <p class="empty-msg">Completá los datos para calcular.</p>
+    </div>
+  </section>
+
+  <!-- Referencia de absorción -->
+  <section class="form-section">
+    <div class="section-header"><h2>Absorción por método</h2></div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.74rem;">
+      <thead><tr>
+        <th style="text-align:left;padding:5px 6px;color:var(--muted);font-size:0.63rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Método</th>
+        <th style="text-align:left;padding:5px 6px;color:var(--muted);font-size:0.63rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Humedad final</th>
+        <th style="text-align:left;padding:5px 6px;color:var(--muted);font-size:0.63rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Factor</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">Agua caliente</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">65–70%</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);font-family:'Space Mono',monospace;color:var(--accent);">~3.5x</td></tr>
+        <tr><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">Alcalina (cal)</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">68–72%</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);font-family:'Space Mono',monospace;color:var(--accent);">~3.8x</td></tr>
+        <tr><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">Vapor</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">60–65%</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);font-family:'Space Mono',monospace;color:var(--accent);">~3.0x</td></tr>
+        <tr><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">Autoclave</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);">55–62%</td><td style="padding:5px 6px;border-bottom:1px solid rgba(51,68,112,0.4);font-family:'Space Mono',monospace;color:var(--accent);">~2.8x</td></tr>
+        <tr><td style="padding:5px 6px;">Frío + Cal</td><td style="padding:5px 6px;">68–75%</td><td style="padding:5px 6px;font-family:'Space Mono',monospace;color:var(--accent);">~4.0x</td></tr>
+      </tbody>
+    </table>
+    <p class="field-hint" style="margin-top:8px;">Factor = kg húmedo ÷ kg seco. Tu referencia: tarros de 10L con tu fórmula dan <b style="color:var(--accent2)">2.8–3.2 kg</b> húmedo por tarro.</p>
+  </section>
+</div>
+
+</div>
+</main>
+
+<footer>Calculadora de Pasteurización · Hongos &nbsp;·&nbsp; <a href="index.html">← Volver al inicio</a></footer>
+
+<script>
+/* ── Datos por método ─────────────────────────────── */
+const METODOS = {
+  agua_caliente: {
+    label: "Agua Caliente (70–80°C)",
+    hint: "Se sumerge el sustrato en agua a 70–80°C durante 1–2 horas. Simple y efectiva para paja. Drenar bien antes de llenar los tarros.",
+    humFinal: 0.68,   // humedad final esperada del sustrato
+    humMin:   0.65,
+    humMax:   0.72,
+    tempC: "70–80°C", duracion: "60–120 min",
+    aguaLitrosPorKgSeco: 8,  // agua necesaria para la inmersión
+    params: [
+      { id:"p_temp",   label:"Temperatura del agua (°C)", default:75,  step:1, hint:"Mantener entre 70–80°C durante todo el proceso" },
+      { id:"p_tiempo", label:"Tiempo de inmersión (min)", default:90,  step:5, hint:"60–120 min según densidad del sustrato" },
+    ],
+  },
+  alcalina: {
+    label: "Alcalina / Encalado (pH 12)",
+    hint: "Hidratación en solución de cal (pH 12) a temperatura ambiente durante 12–18h. Sin calor, bajo costo. Drenar y escurrir bien.",
+    humFinal: 0.70,
+    humMin:   0.68,
+    humMax:   0.73,
+    tempC: "Ambiente", duracion: "12–18 h",
+    aguaLitrosPorKgSeco: 7,
+    params: [
+      { id:"p_gCal",  label:"Gramos de cal por litro de agua", default:10, step:0.5, hint:"10–12 g/L para pH ≈ 12" },
+      { id:"p_horas", label:"Tiempo de inmersión (horas)",     default:14, step:1,   hint:"12–18 horas mínimo" },
+    ],
+  },
+  vapor: {
+    label: "Vapor (90–100°C)",
+    hint: "Vapor a presión atmosférica sobre el sustrato 2–4 horas. Mayor eficiencia que agua caliente. El sustrato absorbe menos agua que en inmersión.",
+    humFinal: 0.63,
+    humMin:   0.60,
+    humMax:   0.66,
+    tempC: "90–100°C", duracion: "2–4 h",
+    aguaLitrosPorKgSeco: 1.5,
+    params: [
+      { id:"p_tiempo",    label:"Tiempo de vaporización (min)", default:180, step:10, hint:"120–240 min según volumen" },
+      { id:"p_aguaVapor", label:"Agua para generar vapor (L)",  default:50,  step:5,  hint:"Aprox. 1 L agua → 1.7 m³ vapor a 100°C" },
+    ],
+  },
+  autoclave: {
+    label: "Autoclave / Vapor a presión (121°C)",
+    hint: "Esterilización completa a 121°C y 15 psi, 90–180 min. Para aserrín enriquecido. Humedad final menor porque el sustrato no se sumerge.",
+    humFinal: 0.58,
+    humMin:   0.55,
+    humMax:   0.62,
+    tempC: "121°C / 15 psi", duracion: "90–180 min",
+    aguaLitrosPorKgSeco: 0.8,
+    params: [
+      { id:"p_tiempo", label:"Tiempo a presión (min)", default:150, step:10, hint:"90–180 min según volumen de la carga" },
+      { id:"p_psi",    label:"Presión (psi)",           default:15,  step:1,  hint:"15 psi = 121°C. No bajar de 12 psi." },
+    ],
+  },
+  hidratacion_fria: {
+    label: "Hidratación en frío + Cal",
+    hint: "Sustrato seco hidratado en agua fría con cal por 18–24h. pH alto (≥12) inhibe competidores. Más sencillo. Mayor absorción de agua.",
+    humFinal: 0.72,
+    humMin:   0.68,
+    humMax:   0.75,
+    tempC: "Ambiente (≤20°C)", duracion: "18–24 h",
+    aguaLitrosPorKgSeco: 7.5,
+    params: [
+      { id:"p_gCal",  label:"Gramos de cal por litro", default:12, step:0.5, hint:"12–15 g/L para pH ≥ 12" },
+      { id:"p_horas", label:"Tiempo de hidratación (horas)", default:20, step:1, hint:"18–24 horas mínimo" },
+    ],
+  },
+};
+
+const INGREDIENTES_COMUNES = {
+  "Paja de trigo":       { pct:100, aditivo:false },
+  "Paja de arroz":       { pct:100, aditivo:false },
+  "Paja de cebada":      { pct:100, aditivo:false },
+  "Aserrín":             { pct:100, aditivo:false },
+  "Pellets de madera":   { pct:100, aditivo:false },
+  "Mazorca de maíz":     { pct:100, aditivo:false },
+  "Pulpa de café":       { pct:100, aditivo:false },
+  "Bagazo de caña":      { pct:100, aditivo:false },
+  "Salvado de trigo":    { pct:15,  aditivo:true  },
+  "Salvado de avena":    { pct:15,  aditivo:true  },
+  "Salvado de arroz":    { pct:10,  aditivo:true  },
+  "Harina de maíz":      { pct:10,  aditivo:true  },
+  "Yeso agrícola":       { pct:1,   aditivo:true  },
+  "Carbonato de calcio": { pct:1,   aditivo:true  },
+  "Cal hidratada":       { pct:2,   aditivo:true  },
+  "Melaza de caña":      { pct:2,   aditivo:true  },
+};
+
+// Kg húmedo de referencia por tipo de recipiente
+const RECIPIENTES = {
+  tarro_350:   { label:"Tarro 350 cc",  kgHumedo:0.30 },
+  tarro_500:   { label:"Tarro 500 cc",  kgHumedo:0.45 },
+  tarro_750:   { label:"Tarro 750 cc",  kgHumedo:0.65 },
+  tarro_1000:  { label:"Tarro 1000 cc", kgHumedo:0.90 },
+  tarro_1500:  { label:"Tarro 1500 cc", kgHumedo:1.30 },
+  tarro_2000:  { label:"Tarro 2000 cc", kgHumedo:1.70 },
+  tarro_10L:   { label:"Tarro 10 L",    kgHumedo:3.00 }, // tu referencia: 2.8–3.2 → central 3.0
+  bolsa_pequeña:{ label:"Bolsa pequeña", kgHumedo:0.50 },
+  bolsa_1kg:   { label:"Bolsa 1 kg",    kgHumedo:1.00 },
+  bolsa_2kg:   { label:"Bolsa 2 kg",    kgHumedo:2.00 },
+  bolsa_3kg:   { label:"Bolsa 3 kg",    kgHumedo:3.00 },
+  bolsa_5kg:   { label:"Bolsa 5 kg",    kgHumedo:5.00 },
+};
+
+let ingrCounter = 0;
+
+/* ── Método ─────────────────────────────────────────── */
+function onMetodoChange() {
+  const val = document.getElementById("tipoPasteurizacion").value;
+  const m = METODOS[val];
+  if (!m) return;
+  document.getElementById("metodoHintText").textContent = m.hint;
+  renderParamBlock(m);
+  calcular();
+}
+
+function renderParamBlock(m) {
+  const block = document.getElementById("paramBlock");
+  if (!block || !m) return;
+  block.innerHTML = m.params.map(p => `
+    <div class="row" style="margin-bottom:4px;">
+      <label class="full">${p.label}
+        <input type="number" id="${p.id}" value="${p.default}" step="${p.step}" min="0" oninput="calcular()">
+        <span class="field-hint">${p.hint}</span>
+      </label>
+    </div>`).join("") + `
+    <div class="row" style="margin-top:8px;">
+      <label>% humedad final esperada
+        <input type="number" id="p_humFinal" step="0.5" min="40" max="85"
+               value="${Math.round(m.humFinal * 100)}" oninput="calcular()">
+        <span class="field-hint">Referencia para ${m.label}: ${Math.round(m.humMin*100)}–${Math.round(m.humMax*100)}%</span>
+      </label>
+    </div>`;
+}
+
+/* ── Recipiente ─────────────────────────────────────── */
+function onRecipienteChange() {
+  const val = document.getElementById("tipoRecipiente").value;
+  const rec = RECIPIENTES[val];
+  const campo = document.getElementById("kgHumedoXRec");
+  const hint  = document.getElementById("hintRecipiente");
+  if (rec) {
+    campo.value = rec.kgHumedo;
+    // Para tarro 10L mostrar tu rango de experiencia
+    if (val === "tarro_10L") {
+      hint.textContent = `Referencia: ${rec.kgHumedo} kg · Tu experiencia: 2.8–3.2 kg húmedo`;
+      hint.className = "field-hint ok";
+    } else {
+      hint.textContent = `Referencia para ${rec.label}: ${rec.kgHumedo} kg húmedo`;
+      hint.className = "field-hint";
+    }
+  } else {
+    hint.textContent = "Ingresá el peso húmedo que cargás en cada recipiente";
+    hint.className = "field-hint";
+  }
+  calcular();
+}
+
+/* ── Ingredientes ───────────────────────────────────── */
+function agregarIngrediente(nombre = "", pct = "", esAditivo = false) {
+  ingrCounter++;
+  const idx = ingrCounter;
+  const div = document.createElement("div");
+  div.className = "ingr-block";
+  div.id = `ingr-${idx}`;
+  const opciones = Object.keys(INGREDIENTES_COMUNES)
+    .map(k => `<option value="${k}">${k}</option>`).join("");
+  div.innerHTML = `
+    <div class="ingr-header">
+      <span class="ingr-num">INGREDIENTE ${idx}</span>
+      <button type="button" class="btn-remove" onclick="eliminarIngrediente(${idx})">✕ Quitar</button>
+    </div>
+    <div class="row">
+      <label>Material
+        <select class="ingr-nombre" onchange="autocompletarIngrediente(${idx})">
+          <option value="">— Seleccioná —</option>
+          ${opciones}
+          <option value="__otro__">Otro</option>
+        </select>
+      </label>
+      <label id="label-pct-${idx}">${esAditivo ? "% sobre peso base (aditivo)" : "% en la mezcla"}
+        <input type="number" class="ingr-pct" min="0.1" max="300" step="0.1"
+               placeholder="${esAditivo ? "15" : "100"}" value="${pct}" oninput="calcular()">
+        <span class="field-hint ingr-kg-calc" id="ingr-kg-${idx}"></span>
+      </label>
+    </div>
+    <div id="otro-panel-${idx}" style="display:none;">
+      <label>Nombre personalizado
+        <input type="text" class="ingr-nombre-custom" placeholder="Nombre del material" oninput="calcular()">
+      </label>
+    </div>`;
+  if (nombre) setTimeout(() => {
+    const sel = div.querySelector(".ingr-nombre");
+    if (sel) sel.value = nombre;
+  }, 0);
+  document.getElementById("ingredientesContainer").appendChild(div);
+  renumerarIngredientes();
+  calcular();
+}
+
+function autocompletarIngrediente(idx) {
+  const div = document.getElementById(`ingr-${idx}`);
+  const val = div.querySelector(".ingr-nombre").value;
+  document.getElementById(`otro-panel-${idx}`).style.display = val === "__otro__" ? "block" : "none";
+  const data = INGREDIENTES_COMUNES[val];
+  if (data) {
+    div.querySelector(".ingr-pct").value = data.pct;
+    const lbl = document.getElementById(`label-pct-${idx}`);
+    if (lbl) lbl.childNodes[0].textContent = data.aditivo
+      ? "% sobre peso base (aditivo) " : "% en la mezcla ";
+  }
+  calcular();
+}
+
+function eliminarIngrediente(idx) {
+  const el = document.getElementById(`ingr-${idx}`);
+  if (el) el.remove();
+  renumerarIngredientes();
+  calcular();
+}
+
+function renumerarIngredientes() {
+  document.querySelectorAll(".ingr-block").forEach((el, i) => {
+    const n = el.querySelector(".ingr-num");
+    if (n) n.textContent = `INGREDIENTE ${i + 1}`;
+  });
+}
+
+function leerIngredientes() {
+  const r = [];
+  document.querySelectorAll(".ingr-block").forEach(el => {
+    const selVal  = el.querySelector(".ingr-nombre")?.value || "";
+    const custom  = el.querySelector(".ingr-nombre-custom")?.value.trim() || "";
+    const nombre  = selVal === "__otro__" ? custom : (selVal || custom);
+    const pct     = Number(el.querySelector(".ingr-pct")?.value) || 0;
+    const data    = INGREDIENTES_COMUNES[selVal] || {};
+    if (nombre && pct > 0) r.push({ nombre, pct, esAditivo: data.aditivo || false, id: el.id });
+  });
+  return r;
+}
+
+/* ── Cálculo principal ──────────────────────────────── */
+function calcular() {
+  const metodoVal  = document.getElementById("tipoPasteurizacion").value;
+  const metodo     = METODOS[metodoVal];
+  const pesoBase   = Number(document.getElementById("pesoBaseSeco").value) || 0;
+  const humInicial = (Number(document.getElementById("humedadInicial").value) || 12) / 100;
+  const humFinal   = (Number(document.getElementById("p_humFinal")?.value) || Math.round(metodo.humFinal * 100)) / 100;
+  const kgHumXRec  = Number(document.getElementById("kgHumedoXRec").value) || 0;
+  const margen     = Number(document.getElementById("margenContam").value) || 0;
+  const tasa       = Number(document.getElementById("tasaSpawn").value) || 5;
+
+  const panel = document.getElementById("resultadoPanel");
+
+  if (pesoBase <= 0) {
+    panel.innerHTML = `<p class="empty-msg">Ingresá el peso base seco para calcular.</p>`;
+    return;
+  }
+
+  const ingrs = leerIngredientes();
+
+  // ── Pesos secos ──
+  const aditivos      = ingrs.filter(d => d.esAditivo);
+  const pesoAditivos  = aditivos.reduce((s, d) => s + pesoBase * (d.pct / 100), 0);
+  const pesoSecoTotal = pesoBase + pesoAditivos;
+
+  // Actualizar kg calc hints en cada ingrediente
+  ingrs.forEach(ing => {
+    const kgEl = document.getElementById(`ingr-kg-${ing.id.replace("ingr-","")}`) ||
+                 document.querySelector(`#${ing.id} .ingr-kg-calc`);
+    if (kgEl) {
+      const kg = ing.esAditivo ? pesoBase * (ing.pct / 100) : pesoBase;
+      kgEl.textContent = `= ${kg.toFixed(3)} kg`;
+    }
+  });
+
+  // ── Agua necesaria ──
+  // Para inmersión (agua caliente, alcalina, frío+cal): litros de tina
+  // Para vapor/autoclave: agua de proceso
+  let aguaLitros = 0;
+  if (metodoVal === "agua_caliente" || metodoVal === "alcalina" || metodoVal === "hidratacion_fria") {
+    aguaLitros = pesoSecoTotal * metodo.aguaLitrosPorKgSeco;
+  } else if (metodoVal === "vapor") {
+    aguaLitros = Number(document.getElementById("p_aguaVapor")?.value) || 50;
+  } else {
+    aguaLitros = pesoSecoTotal * metodo.aguaLitrosPorKgSeco;
+  }
+
+  // Cal para métodos alcalinos
+  let calKg = 0;
+  if (metodoVal === "alcalina" || metodoVal === "hidratacion_fria") {
+    const gCal = Number(document.getElementById("p_gCal")?.value) || 10;
+    calKg = (aguaLitros * gCal) / 1000;
+  }
+
+  // ── Peso húmedo post-pasteurización ──
+  // Fórmula: pesoHumedo = pesoSeco / (1 - humFinal)
+  // El material ya tiene humInicial, así que el agua absorbida es la diferencia
+  const pesoHumedoTotal = pesoSecoTotal / (1 - humFinal);
+  const aguaAbsorbida   = pesoHumedoTotal - pesoSecoTotal;
+  const factorHid       = pesoHumedoTotal / pesoSecoTotal;
+
+  // Rango basado en humMin/humMax del método
+  const pesoHumedoMin = pesoSecoTotal / (1 - metodo.humMin);
+  const pesoHumedoMax = pesoSecoTotal / (1 - metodo.humMax);
+
+  // ── Tarros ──
+  // Cantidad calculada a partir del peso húmedo total ÷ kg húmedo por recipiente
+  let cantBase = 0, cantConMargen = 0;
+  let kgHumXRecEst = kgHumXRec; // el que ingresó el usuario
+
+  if (kgHumXRec > 0) {
+    cantBase      = Math.ceil(pesoHumedoTotal / kgHumXRec);
+    cantConMargen = Math.ceil(cantBase * (1 + margen / 100));
+  }
+
+  // Rango de tarros basado en humMin/humMax
+  const cantMin = kgHumXRec > 0 ? Math.ceil(pesoHumedoMin / kgHumXRec) : 0;
+  const cantMax = kgHumXRec > 0 ? Math.ceil(pesoHumedoMax / kgHumXRec) : 0;
+
+  // ── Spawn ──
+  const spawnKg   = pesoHumedoTotal * (tasa / 100);
+  const spawnXRec = cantBase > 0 ? (spawnKg / cantBase * 1000) : 0;
+
+  // ── Producción esperada (RB 50–80% sobre peso húmedo, para Pleurotus) ──
+  const prodMin = pesoHumedoTotal * 0.50;
+  const prodMax = pesoHumedoTotal * 0.80;
+
+  const fmt = (n, d = 2) => Number(n).toFixed(d);
+
+  // ── Tu referencia calibrada para tarro 10L ──
+  const esTarro10L = document.getElementById("tipoRecipiente")?.value === "tarro_10L";
+  const refCalibracion = esTarro10L
+    ? `<div class="info-box" style="margin-top:-4px;">
+        🎯 <b>Tu referencia:</b> con esta fórmula en tarros de 10L esperás <b>2.8–3.2 kg</b> húmedo por tarro.
+        El cálculo da ${fmt(kgHumXRec)} kg/tarro → ${cantBase} tarros base.
+        ${Math.abs(kgHumXRec - 3.0) > 0.5 ? `<br>⚠ Ajustá el campo "Kg húmedo por recipiente" a tu valor real (2.8–3.2 kg).` : ""}
+       </div>` : "";
+
+  panel.innerHTML = `
+
+    <!-- Grandes números -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      ${cantBase > 0 ? `
+      <div class="res-highlight">
+        <div class="res-big">${cantConMargen}</div>
+        <div class="res-big-label">Tarros a preparar</div>
+        ${margen > 0
+          ? `<div style="font-size:0.68rem;color:var(--muted);margin-top:2px;">${cantBase} base + ${cantConMargen - cantBase} extra (${margen}%)</div>`
+          : ""}
+      </div>`
+      : `<div class="res-highlight" style="opacity:0.5;"><div class="res-big">—</div><div class="res-big-label">Seleccioná recipiente</div></div>`}
+      <div class="res-highlight2">
+        <div class="res-big2">${fmt(pesoHumedoTotal)} kg</div>
+        <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;">Peso húmedo total</div>
+        <div style="font-size:0.68rem;color:var(--muted2);margin-top:2px;">Factor ${fmt(factorHid, 2)}x · hum. ${Math.round(humFinal * 100)}%</div>
+      </div>
+    </div>
+
+    ${refCalibracion}
+
+    <!-- Composición seca -->
+    <div class="res-seccion">
+      <div class="res-header">📦 Composición seca del lote</div>
+      <div class="res-row"><span class="res-label">Base principal</span><span class="res-valor">${fmt(pesoBase)} kg (100%)</span></div>
+      ${aditivos.map(d => `
+      <div class="res-row">
+        <span class="res-label">${d.nombre} (${d.pct}%)</span>
+        <span class="res-valor">${fmt(pesoBase * d.pct / 100, 3)} kg</span>
+      </div>`).join("")}
+      <div class="res-row" style="background:rgba(163,207,54,0.04);">
+        <span class="res-label" style="font-weight:600;color:var(--text);">Total seco</span>
+        <span class="res-valor">${fmt(pesoSecoTotal, 3)} kg</span>
+      </div>
+    </div>
+
+    <!-- Pasteurización -->
+    <div class="res-seccion">
+      <div class="res-header">⚗️ Pasteurización — ${metodo.label}</div>
+      <div class="res-row"><span class="res-label">Temperatura / tiempo</span><span class="res-valor">${metodo.tempC} · ${metodo.duracion}</span></div>
+      ${(metodoVal === "agua_caliente" || metodoVal === "alcalina" || metodoVal === "hidratacion_fria")
+        ? `<div class="res-row"><span class="res-label">Agua para la tina</span><span class="res-valor">${fmt(aguaLitros, 0)} L</span></div>` : ""}
+      ${calKg > 0
+        ? `<div class="res-row"><span class="res-label">Cal hidratada</span><span class="res-valor">${fmt(calKg, 3)} kg <span class="res-sub">(${fmt(calKg * 1000, 0)} g)</span></span></div>` : ""}
+      <div class="res-row"><span class="res-label">Agua absorbida (estimada)</span><span class="res-valor">${fmt(aguaAbsorbida, 2)} kg</span></div>
+      <div class="res-row"><span class="res-label">Humedad final (${Math.round(metodo.humMin*100)}–${Math.round(metodo.humMax*100)}%)</span><span class="res-valor">${Math.round(humFinal * 100)}%</span></div>
+    </div>
+
+    <!-- Peso húmedo resultante -->
+    <div class="res-seccion">
+      <div class="res-header">💧 Peso húmedo post-pasteurización</div>
+      <div class="res-row"><span class="res-label">Peso húmedo central</span><span class="res-valor">${fmt(pesoHumedoTotal)} kg</span></div>
+      <div class="res-row"><span class="res-label">Rango según humedad</span><span class="res-valor">${fmt(pesoHumedoMin, 1)} – ${fmt(pesoHumedoMax, 1)} kg</span></div>
+      <div class="res-row"><span class="res-label">Factor de hidratación</span><span class="res-valor">${fmt(factorHid, 2)}x <span class="res-sub">por kg seco</span></span></div>
+    </div>
+
+    <!-- Tarros -->
+    ${kgHumXRec > 0 ? `
+    <div class="res-seccion">
+      <div class="res-header">🫙 Cantidad de tarros / bolsas</div>
+      <div class="res-row"><span class="res-label">Kg húmedo por recipiente</span><span class="res-valor">${fmt(kgHumXRec)} kg</span></div>
+      <div class="res-row"><span class="res-label">Tarros base (central)</span><span class="res-valor">${cantBase} unidades</span></div>
+      ${cantMin !== cantMax ? `<div class="res-row"><span class="res-label">Rango según humedad</span><span class="res-valor">${cantMin} – ${cantMax} unidades</span></div>` : ""}
+      ${margen > 0 ? `<div class="res-row"><span class="res-label">Extra por contam. (${margen}%)</span><span class="res-valor">+ ${cantConMargen - cantBase} unidades</span></div>` : ""}
+      <div class="res-row" style="background:rgba(163,207,54,0.05);">
+        <span class="res-label" style="color:var(--text);font-weight:600;">✅ Total a preparar</span>
+        <span class="res-valor" style="font-size:1rem;">${cantConMargen} unidades</span>
+      </div>
+    </div>` : ""}
+
+    <!-- Spawn -->
+    <div class="res-seccion">
+      <div class="res-header">🧫 Spawn (${tasa}% sobre peso húmedo)</div>
+      <div class="res-row"><span class="res-label">Spawn total</span><span class="res-valor">${fmt(spawnKg, 3)} kg <span class="res-sub">(${fmt(spawnKg * 1000, 0)} g)</span></span></div>
+      ${cantBase > 0 ? `<div class="res-row"><span class="res-label">Spawn por tarro (promedio)</span><span class="res-valor">${fmt(spawnXRec, 1)} g</span></div>` : ""}
+    </div>
+
+    <!-- Producción esperada -->
+    <div class="res-seccion">
+      <div class="res-header">📈 Producción esperada (RB 50–80%)</div>
+      <div class="res-row"><span class="res-label">Mínimo estimado</span><span class="res-valor">${fmt(prodMin)} kg</span></div>
+      <div class="res-row"><span class="res-label">Máximo estimado</span><span class="res-valor">${fmt(prodMax)} kg</span></div>
+      ${cantBase > 0 ? `<div class="res-row"><span class="res-label">Por tarro (promedio)</span><span class="res-valor">${fmt((prodMin + prodMax) / 2 / cantBase, 3)} kg</span></div>` : ""}
+    </div>
+
+    <div class="warn-box">
+      ⚠ El peso húmedo es una estimación basada en la humedad final del método. El valor real depende del tiempo de escurrido. Pesá los tarros después de llenarlos y usá el <b>Paso 2</b> de la calculadora de tarros para los cálculos exactos.
+    </div>
+  `;
+}
+
+/* ── Init ─────────────────────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+  // Tu fórmula habitual por defecto
+  agregarIngrediente("Paja de trigo",       "100", false);
+  agregarIngrediente("Salvado de avena",    "15",  true);
+  agregarIngrediente("Yeso agrícola",       "1",   true);
+  agregarIngrediente("Carbonato de calcio", "1",   true);
+
+  // Tarro 10L y 3 kg húmedo como default
+  document.getElementById("tipoRecipiente").value = "tarro_10L";
+  document.getElementById("kgHumedoXRec").value   = "3.00";
+
+  // Iniciar método
+  onMetodoChange();
+});
+</script>
+</body>
+</html>

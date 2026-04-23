@@ -1,0 +1,26 @@
+{
+  "name": "Registro Producción Hongos",
+  "short_name": "Hongos 🍄",
+  "description": "Control integral de producción de hongos: preparación, inoculación, incubación y fructificación.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a2540",
+  "theme_color": "#1a2540",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231a2540'/%3E%3Ctext x='50%25' y='54%25' font-size='120' text-anchor='middle' dominant-baseline='middle'%3E🍄%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231a2540'/%3E%3Ctext x='50%25' y='54%25' font-size='320' text-anchor='middle' dominant-baseline='middle'%3E🍄%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "es"
+}

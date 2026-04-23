@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tasa de Inoculación · Hongos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #1e2b42; --card: #243050; --card2: #2a3860;
+  --border: #334470; --muted: #7a90b8; --muted2: #a0b4d0;
+  --accent: #a3cf36; --accent2: #22d3ee;
+  --text: #dde8f0; --surface: #1a2540; --danger: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.bg-glow { position: fixed; top: -180px; left: 50%; transform: translateX(-50%); width: 700px; height: 360px; background: radial-gradient(ellipse, rgba(163,207,54,0.05) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--surface); color: var(--text); padding: 24px 28px 48px; position: relative; z-index: 1; min-height: 100vh; font-size: 14px; line-height: 1.6; }
+header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.header-inner { display: flex; align-items: center; gap: 14px; }
+.logo-mark { font-size: 1.7rem; line-height: 1; }
+h1 { font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 600; }
+.subtitle { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+.header-badge { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--accent); border: 1px solid rgba(163,207,54,0.3); padding: 3px 10px; border-radius: 20px; background: rgba(163,207,54,0.06); text-decoration: none; }
+.header-badge:hover { background: rgba(163,207,54,0.12); }
+.layout { display: grid; grid-template-columns: 1fr 360px; gap: 14px; align-items: start; }
+.left { display: flex; flex-direction: column; gap: 14px; }
+.right { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 14px; }
+.form-section { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); animation: fadeIn 0.22s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.section-header::before { content: ''; display: block; width: 3px; height: 20px; background: var(--accent); border-radius: 2px; flex-shrink: 0; opacity: 0.75; }
+.section-header h2 { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.row label { flex: 1; }
+label { display: block; font-size: 0.76rem; font-weight: 500; color: var(--muted2); margin-bottom: 5px; }
+input, select { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.84rem; transition: border-color 0.18s, box-shadow 0.18s; margin-top: 5px; }
+input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(163,207,54,0.08); }
+input::placeholder { color: #2e3d52; }
+option { background: var(--card2); color: var(--text); }
+.field-hint { font-size: 0.68rem; color: var(--muted); display: block; margin-top: 4px; font-style: italic; }
+/* Slider */
+input[type="range"] { -webkit-appearance: none; appearance: none; height: 5px; border-radius: 3px; background: var(--border); outline: none; padding: 0; margin-top: 8px; cursor: pointer; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--card); box-shadow: 0 0 4px rgba(163,207,54,0.4); }
+/* Btn */
+button.btn-calc { width: 100%; padding: 11px; background: var(--accent); color: #0c1a00; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.18s; }
+button.btn-calc:hover { background: #bce254; }
+/* Resultado */
+.res-panel { display: flex; flex-direction: column; gap: 10px; }
+.res-seccion { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.res-header { padding: 8px 12px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border); font-size: 0.68rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.06em; }
+.res-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 12px; border-bottom: 1px solid rgba(51,68,112,0.6); gap: 8px; }
+.res-row:last-child { border-bottom: none; }
+.res-label { font-size: 0.78rem; color: var(--muted2); flex: 1; }
+.res-valor { font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--accent); text-align: right; }
+.res-sub { font-size: 0.63rem; font-weight: 400; color: var(--muted); margin-left: 4px; }
+/* Big number */
+.big-num { font-family: 'Space Mono', monospace; font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.big-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+/* Timeline colonización */
+.timeline { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+.timeline-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(51,68,112,0.5); }
+.timeline-row:last-child { border-bottom: none; }
+.timeline-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.timeline-label { font-size: 0.75rem; color: var(--muted2); flex: 1; }
+.timeline-val { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent); }
+/* Temp gauge */
+.temp-scale { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+.temp-chip { font-size: 0.68rem; padding: 3px 8px; border-radius: 4px; font-family: 'Space Mono', monospace; border: 1px solid; }
+/* Tabla de especie */
+.especie-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 4px; }
+.especie-table th { text-align: left; padding: 6px 8px; color: var(--muted); font-weight: 600; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+.especie-table td { padding: 6px 8px; color: var(--text-dim); border-bottom: 1px solid rgba(51,68,112,0.4); }
+.especie-table tr:last-child td { border-bottom: none; }
+.especie-table tr:hover td { background: rgba(255,255,255,0.02); }
+.empty-msg { color: var(--muted); font-size: 0.82rem; padding: 24px 0; text-align: center; }
+footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.76rem; text-align: center; }
+footer a { color: var(--accent); text-decoration: none; }
+@media (max-width: 960px) { .layout { grid-template-columns: 1fr; } .right { position: static; } }
+@media (max-width: 600px) { body { padding: 12px 14px 32px; } .row { flex-direction: column; } }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">💉</div>
+    <div>
+      <h1>Tasa de Inoculación</h1>
+      <p class="subtitle">Hongos · Spawn y colonización estimada</p>
+    </div>
+    <a href="index.html" class="header-badge">← Inicio</a>
+  </div>
+</header>
+
+<main>
+<div class="layout">
+<div class="left">
+
+  <!-- ESPECIE -->
+  <section class="form-section">
+    <div class="section-header"><h2>Especie y condiciones</h2></div>
+    <div class="row">
+      <label>Especie
+        <select id="especie" onchange="cargarEspecie()">
+          <option value="">— Seleccioná —</option>
+          <option value="pleurotus_ostreatus">Pleurotus ostreatus</option>
+          <option value="pleurotus_djamor">Pleurotus djamor</option>
+          <option value="pleurotus_eryngii">Pleurotus eryngii</option>
+          <option value="lentinula_edodes">Lentinula edodes (Shiitake)</option>
+          <option value="hericium_erinaceus">Hericium erinaceus</option>
+          <option value="ganoderma">Ganoderma lucidum</option>
+          <option value="agaricus">Agaricus bisporus</option>
+          <option value="custom">Personalizada</option>
+        </select>
+      </label>
+      <label>Temperatura de incubación (°C)
+        <input type="number" id="tempInc" min="10" max="35" step="0.5" placeholder="24" oninput="updateTempDisplay();calcular()">
+        <span class="field-hint" id="tempHint">Ingresá la temperatura real de tu sala</span>
+      </label>
+    </div>
+    <div id="customEspeciePanel" style="display:none;">
+      <div class="row">
+        <label>Tasa spawn mínima (%)
+          <input type="number" id="customSpawnMin" value="3" step="0.5" min="1" oninput="calcular()">
+        </label>
+        <label>Tasa spawn máxima (%)
+          <input type="number" id="customSpawnMax" value="6" step="0.5" min="1" oninput="calcular()">
+        </label>
+      </div>
+      <div class="row">
+        <label>Días colonización a temp. óptima
+          <input type="number" id="customDiasOpt" value="14" step="1" min="1" oninput="calcular()">
+        </label>
+        <label>Temp. óptima de colonización (°C)
+          <input type="number" id="customTempOpt" value="24" step="0.5" min="1" oninput="calcular()">
+        </label>
+      </div>
+    </div>
+    <div id="especieHint" style="display:none;margin-top:8px;" class="field-hint"></div>
+  </section>
+
+  <!-- SUSTRATO Y SPAWN -->
+  <section class="form-section">
+    <div class="section-header"><h2>Sustrato y tipo de spawn</h2></div>
+    <div class="row">
+      <label>Peso del sustrato húmedo (kg)
+        <input type="number" id="pesoSustrato" min="0.1" step="0.1" placeholder="100" oninput="calcular()">
+        <span class="field-hint">Post-pasteurización, antes de inocular</span>
+      </label>
+      <label>Tipo de spawn
+        <select id="tipoSpawn" onchange="calcular()">
+          <option value="grano">Grano (trigo, centeno, maíz)</option>
+          <option value="serrín">Aserrín/pellets</option>
+          <option value="paja">Paja fragmentada</option>
+          <option value="líquido">Cultivo líquido (LC)</option>
+          <option value="agar">Transferencia en agar</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label>Tasa de inoculación deseada (%)
+        <input type="range" id="tasaSlider" min="1" max="25" step="0.5" value="5" oninput="document.getElementById('tasaVal').textContent=this.value+'%';calcular()">
+        <div style="display:flex;justify-content:space-between;margin-top:3px;">
+          <span class="field-hint">1% (mínimo)</span>
+          <span style="font-family:'Space Mono',monospace;font-size:0.82rem;color:var(--accent);" id="tasaVal">5%</span>
+          <span class="field-hint">25% (máximo)</span>
+        </div>
+      </label>
+    </div>
+    <div class="row">
+      <label>Peso del frasco/bolsa de spawn (g)
+        <input type="number" id="pesoFrasco" min="10" step="10" placeholder="500" oninput="calcular()">
+        <span class="field-hint">Para calcular cantidad de frascos/bolsas</span>
+      </label>
+      <label>Precio del spawn ($/unidad) — opcional
+        <input type="number" id="precioSpawn" min="0" step="0.01" placeholder="0" oninput="calcular()">
+      </label>
+    </div>
+  </section>
+
+  <!-- RECIPIENTES -->
+  <section class="form-section">
+    <div class="section-header"><h2>Recipientes</h2></div>
+    <div class="row">
+      <label>Cantidad de recipientes
+        <input type="number" id="cantRecipientes" min="1" step="1" placeholder="20" oninput="calcular()">
+      </label>
+      <label>Peso de sustrato por recipiente (kg)
+        <input type="number" id="pesoPorRecipiente" min="0.1" step="0.1" placeholder="5" oninput="calcular()">
+        <span class="field-hint">O ingresá el peso total arriba</span>
+      </label>
+    </div>
+  </section>
+
+  <button type="button" class="btn-calc" onclick="calcular()">⚡ Calcular inoculación</button>
+</div>
+
+<!-- RESULTADOS -->
+<div class="right">
+  <section class="form-section">
+    <div class="section-header"><h2>Resultados</h2></div>
+    <div id="resultadoPanel" class="res-panel">
+      <p class="empty-msg">Completá los datos para calcular.</p>
+    </div>
+  </section>
+
+  <!-- Tabla referencia especies -->
+  <section class="form-section">
+    <div class="section-header"><h2>Referencia por especie</h2></div>
+    <table class="especie-table">
+      <thead><tr><th>Especie</th><th>Spawn %</th><th>T°C opt.</th><th>Días col.</th></tr></thead>
+      <tbody>
+        <tr><td>P. ostreatus</td><td>3–6%</td><td>22–26°C</td><td>10–18</td></tr>
+        <tr><td>P. djamor</td><td>3–6%</td><td>25–30°C</td><td>8–14</td></tr>
+        <tr><td>P. eryngii</td><td>4–8%</td><td>20–25°C</td><td>14–21</td></tr>
+        <tr><td>L. edodes</td><td>5–10%</td><td>22–26°C</td><td>30–60</td></tr>
+        <tr><td>H. erinaceus</td><td>5–10%</td><td>18–22°C</td><td>14–25</td></tr>
+        <tr><td>Ganoderma</td><td>5–10%</td><td>26–30°C</td><td>30–60</td></tr>
+        <tr><td>A. bisporus</td><td>10–20%</td><td>22–26°C</td><td>14–21</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+</div>
+</main>
+
+<footer>Tasa de Inoculación · Hongos &nbsp;·&nbsp; <a href="index.html">← Volver al inicio</a></footer>
+
+<script>
+const ESPECIES_DATA = {
+  pleurotus_ostreatus: { label:"Pleurotus ostreatus", spawnMin:3, spawnMax:6, tempOpt:24, tempMin:18, tempMax:30, diasOpt:14, diasMin:10, diasMax:18, q10:2.0, hint:"Muy rápido. Temperatura cálida acelera notablemente la colonización." },
+  pleurotus_djamor:    { label:"Pleurotus djamor",    spawnMin:3, spawnMax:6, tempOpt:27, tempMin:22, tempMax:32, diasOpt:11, diasMin:8,  diasMax:14, q10:2.1, hint:"El más rápido. Prefiere temperaturas más altas que el ostreatus." },
+  pleurotus_eryngii:   { label:"Pleurotus eryngii",   spawnMin:4, spawnMax:8, tempOpt:22, tempMin:16, tempMax:27, diasOpt:18, diasMin:14, diasMax:21, q10:1.9, hint:"Colonización más lenta. Prefiere sustratos compactos y temperatura fresca." },
+  lentinula_edodes:    { label:"Lentinula edodes",    spawnMin:5, spawnMax:10, tempOpt:24, tempMin:15, tempMax:27, diasOpt:45, diasMin:30, diasMax:60, q10:1.8, hint:"Proceso largo. La temperatura es crítica; por encima de 28°C puede inhibirse." },
+  hericium_erinaceus:  { label:"Hericium erinaceus",  spawnMin:5, spawnMax:10, tempOpt:20, tempMin:15, tempMax:25, diasOpt:18, diasMin:14, diasMax:25, q10:1.8, hint:"Sensible al calor. Mantener < 24°C. Muy sensible a contaminantes." },
+  ganoderma:           { label:"Ganoderma lucidum",   spawnMin:5, spawnMax:10, tempOpt:28, tempMin:22, tempMax:32, diasOpt:45, diasMin:30, diasMax:60, q10:1.9, hint:"Proceso largo. Tolera bien el calor. Requiere esterilización." },
+  agaricus:            { label:"Agaricus bisporus",   spawnMin:10, spawnMax:20, tempOpt:24, tempMin:18, tempMax:28, diasOpt:14, diasMin:10, diasMax:21, q10:1.7, hint:"Alta tasa de spawn necesaria. Requiere compost específico." },
+  custom:              { label:"Personalizada",        spawnMin:3, spawnMax:6, tempOpt:24, tempMin:18, tempMax:30, diasOpt:14, diasMin:10, diasMax:20, q10:2.0, hint:"Ingresá los rangos manualmente." },
+};
+
+const SPAWN_EFFICIENCY = { grano:1.0, serrín:0.9, paja:0.85, líquido:0.7, agar:0.95 };
+const SPAWN_NOTAS = {
+  grano: "Grano: mayor velocidad de colonización, mayor riesgo de contaminación.",
+  serrín: "Aserrín: más económico, colonización ligeramente más lenta.",
+  paja: "Paja: bajo costo, colonización irregular en algunos casos.",
+  líquido: "LC: colonización muy rápida pero requiere técnica aséptica.",
+  agar: "Agar: para producción de spawn, no recomendado para producción directa.",
+};
+
+function cargarEspecie() {
+  const val = document.getElementById("especie").value;
+  const esp = ESPECIES_DATA[val];
+  const hint = document.getElementById("especieHint");
+  const customPanel = document.getElementById("customEspeciePanel");
+  if (!esp) { hint.style.display = "none"; customPanel.style.display = "none"; return; }
+  hint.textContent = "💡 " + esp.hint;
+  hint.style.display = "block";
+  customPanel.style.display = val === "custom" ? "block" : "none";
+  // Pre-llenar temp optima
+  if (!document.getElementById("tempInc").value) {
+    document.getElementById("tempInc").value = esp.tempOpt;
+  }
+  updateTempDisplay();
+  calcular();
+}
+
+function updateTempDisplay() {
+  const val = document.getElementById("especie").value;
+  const esp = ESPECIES_DATA[val];
+  const temp = Number(document.getElementById("tempInc").value);
+  const hint = document.getElementById("tempHint");
+  if (!esp || !temp) return;
+  if (temp < esp.tempMin) hint.textContent = `⚠️ Muy baja (mín. ${esp.tempMin}°C) — colonización muy lenta o nula`;
+  else if (temp > esp.tempMax) hint.textContent = `⚠️ Muy alta (máx. ${esp.tempMax}°C) — riesgo de inhibición`;
+  else if (Math.abs(temp - esp.tempOpt) <= 2) hint.textContent = `✔ Temperatura óptima para esta especie (${esp.tempOpt}°C)`;
+  else hint.textContent = `Rango válido: ${esp.tempMin}–${esp.tempMax}°C · Óptimo: ${esp.tempOpt}°C`;
+}
+
+function getEspecieRangos() {
+  const val = document.getElementById("especie").value;
+  if (val === "custom") {
+    return {
+      ...ESPECIES_DATA["custom"],
+      spawnMin: Number(document.getElementById("customSpawnMin").value) || 3,
+      spawnMax: Number(document.getElementById("customSpawnMax").value) || 6,
+      diasOpt:  Number(document.getElementById("customDiasOpt").value)  || 14,
+      tempOpt:  Number(document.getElementById("customTempOpt").value)  || 24,
+    };
+  }
+  return ESPECIES_DATA[val] || null;
+}
+
+function estimarDiasColonizacion(esp, temp) {
+  if (!temp || !esp) return null;
+  if (temp < esp.tempMin || temp > esp.tempMax) return null;
+  // Modelo Q10: tiempo se multiplica por Q10 por cada 10°C de diferencia
+  const deltaT = esp.tempOpt - temp;
+  const factor = Math.pow(esp.q10, deltaT / 10);
+  return {
+    dias: Math.round(esp.diasOpt * factor),
+    diasMin: Math.round(esp.diasMin * (temp < esp.tempOpt ? factor : 1/factor * 0.85)),
+    diasMax: Math.round(esp.diasMax * (temp < esp.tempOpt ? factor * 1.15 : 1)),
+  };
+}
+
+function calcular() {
+  const esp = getEspecieRangos();
+  const pesoInput = Number(document.getElementById("pesoSustrato").value) || 0;
+  const cantRec   = Number(document.getElementById("cantRecipientes").value) || 0;
+  const pesoPorRec= Number(document.getElementById("pesoPorRecipiente").value) || 0;
+  const tipoSpawn = document.getElementById("tipoSpawn").value;
+  const tasa      = Number(document.getElementById("tasaSlider").value) || 5;
+  const pesoFrasco= Number(document.getElementById("pesoFrasco").value) || 0;
+  const precioUnit= Number(document.getElementById("precioSpawn").value) || 0;
+  const temp      = Number(document.getElementById("tempInc").value);
+
+  // Calcular peso total de sustrato
+  let pesoTotal = pesoInput;
+  if (pesoTotal <= 0 && cantRec > 0 && pesoPorRec > 0) pesoTotal = cantRec * pesoPorRec;
+
+  const panel = document.getElementById("resultadoPanel");
+  if (pesoTotal <= 0) {
+    panel.innerHTML = `<p class="empty-msg">Ingresá el peso del sustrato para calcular.</p>`;
+    return;
+  }
+
+  // Cálculo de spawn
+  const spawnKg = pesoTotal * (tasa / 100);
+  const spawnG  = spawnKg * 1000;
+  const frascos = pesoFrasco > 0 ? Math.ceil(spawnG / pesoFrasco) : null;
+  const costo   = (frascos && precioUnit > 0) ? frascos * precioUnit : null;
+
+  // Spawn mínimo y máximo sugerido
+  const spawnMinKg = esp ? pesoTotal * (esp.spawnMin / 100) : null;
+  const spawnMaxKg = esp ? pesoTotal * (esp.spawnMax / 100) : null;
+
+  // Validación de tasa
+  let tasaStatus = "ok", tasaMsg = "";
+  if (esp) {
+    if (tasa < esp.spawnMin) { tasaStatus = "bajo"; tasaMsg = `⚠️ Tasa baja — mínimo sugerido: ${esp.spawnMin}%`; }
+    else if (tasa > esp.spawnMax) { tasaStatus = "alto"; tasaMsg = `ℹ️ Tasa alta — puede desperdiciar spawn (máx. sugerido: ${esp.spawnMax}%)`; }
+    else tasaMsg = `✔ Dentro del rango recomendado (${esp.spawnMin}–${esp.spawnMax}%)`;
+  }
+
+  // Colonización estimada
+  const colResult = (esp && temp) ? estimarDiasColonizacion(esp, temp) : null;
+  const eficiencia = SPAWN_EFFICIENCY[tipoSpawn] || 1.0;
+  const diasAjustados = colResult ? {
+    dias: Math.round(colResult.dias / eficiencia),
+    diasMin: Math.round(colResult.diasMin / eficiencia),
+    diasMax: Math.round(colResult.diasMax / eficiencia),
+  } : null;
+
+  // Fecha estimada si hoy + días
+  const hoy = new Date();
+  const fechaFin = diasAjustados ? new Date(hoy.getTime() + diasAjustados.dias * 86400000) : null;
+  const fechaMax = diasAjustados ? new Date(hoy.getTime() + diasAjustados.diasMax * 86400000) : null;
+  const fmtFecha = d => d.toLocaleDateString("es-AR", { day:"2-digit", month:"2-digit" });
+
+  panel.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div style="background:rgba(163,207,54,0.06);border:1px solid rgba(163,207,54,0.18);border-radius:10px;padding:14px;text-align:center;">
+        <div class="big-num">${spawnKg.toFixed(2)}</div>
+        <div class="big-label">kg de spawn</div>
+      </div>
+      ${diasAjustados ? `
+      <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.18);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:'Space Mono',monospace;font-size:2rem;font-weight:700;color:var(--accent2);line-height:1;">${diasAjustados.dias}</div>
+        <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;">días estimados</div>
+      </div>` : `<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:0.75rem;">Ingresá especie y temperatura</div>`}
+    </div>
+
+    <div class="res-seccion">
+      <div class="res-header">Spawn necesario</div>
+      <div class="res-row"><span class="res-label">Spawn a inocular</span><span class="res-valor">${spawnKg.toFixed(3)} kg <span class="res-sub">(${spawnG.toFixed(0)} g)</span></span></div>
+      <div class="res-row"><span class="res-label">Tasa aplicada</span>
+        <span class="res-valor" style="color:${tasaStatus==='ok'?'var(--accent)':tasaStatus==='bajo'?'#fbbf24':'var(--accent2)'};">${tasa}% <span class="res-sub">${tasaMsg}</span></span>
+      </div>
+      ${esp ? `<div class="res-row"><span class="res-label">Rango sugerido</span><span class="res-valor">${spawnMinKg.toFixed(2)}–${spawnMaxKg.toFixed(2)} kg <span class="res-sub">(${esp.spawnMin}–${esp.spawnMax}%)</span></span></div>` : ""}
+      ${frascos ? `<div class="res-row"><span class="res-label">Frascos/bolsas (${pesoFrasco}g)</span><span class="res-valor">${frascos} <span class="res-sub">unidades</span></span></div>` : ""}
+      ${costo ? `<div class="res-row"><span class="res-label">Costo estimado spawn</span><span class="res-valor">$${costo.toFixed(2)}</span></div>` : ""}
+    </div>
+
+    ${diasAjustados ? `
+    <div class="res-seccion">
+      <div class="res-header">Colonización estimada${temp ? ` · ${temp}°C` : ""}</div>
+      <div class="res-row"><span class="res-label">Días estimados</span><span class="res-valor">${diasAjustados.diasMin}–${diasAjustados.diasMax} días</span></div>
+      <div class="res-row"><span class="res-label">Valor central</span><span class="res-valor">${diasAjustados.dias} días</span></div>
+      ${fechaFin ? `<div class="res-row"><span class="res-label">Fecha estimada listo</span><span class="res-valor">${fmtFecha(fechaFin)} – ${fmtFecha(fechaMax)}</span></div>` : ""}
+      <div class="res-row"><span class="res-label">Tipo de spawn</span><span class="res-valor" style="text-transform:capitalize;">${tipoSpawn} <span class="res-sub">(efic. ${(eficiencia*100).toFixed(0)}%)</span></span></div>
+    </div>
+    <div style="padding:10px 12px;background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.14);border-radius:8px;font-size:0.75rem;color:var(--muted2);">
+      ℹ️ ${SPAWN_NOTAS[tipoSpawn]}
+    </div>` : ""}
+
+    <div class="res-seccion">
+      <div class="res-header">Distribución por recipiente</div>
+      ${cantRec > 0 ? `
+        <div class="res-row"><span class="res-label">Spawn por recipiente</span><span class="res-valor">${(spawnG / cantRec).toFixed(1)} g</span></div>
+        <div class="res-row"><span class="res-label">Sustrato por recipiente</span><span class="res-valor">${(pesoTotal / cantRec).toFixed(2)} kg</span></div>
+      ` : `<div style="padding:10px 12px;color:var(--muted);font-size:0.78rem;">Ingresá la cantidad de recipientes para ver distribución.</div>`}
+    </div>`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelector(".layout").addEventListener("input", e => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") calcular();
+  });
+  document.querySelector(".layout").addEventListener("change", e => {
+    if (e.target.tagName === "SELECT") calcular();
+  });
+});
+</script>
+</body>
+</html>
